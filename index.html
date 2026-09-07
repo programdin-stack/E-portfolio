@@ -1,228 +1,679 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>E-Portfolio นายตรีทเศศ ไตรโยธี</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <style>
-    body {
-      font-family: 'Sarabun', sans-serif;
-    }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>E-Portfolio นายตรีทเศศ ไตรโยธี</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Sarabun', sans-serif;
+    background-color: #f9fafb;
+    background-image: linear-gradient(to bottom right, #f3f4f6, #ffffff);
+    margin: 0;
+    padding: 2.5rem 1rem 8rem 1rem; /* extra bottom padding so dock doesn't cover content */
+    min-height: 100vh;
+  }
 
-    .icon-animate {
-      display: inline-block;
-      animation: bounce 2s infinite;
-    }
+  .container { max-width: 56rem; margin: auto; }
 
-    @keyframes bounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-6px); }
-    }
+  /* ===== Animations ===== */
+  .icon-animate { display: inline-block; animation: bounce 2s infinite; }
+  @keyframes bounce { 0%,100% { transform: translateY(0);} 50% { transform: translateY(-5px);} }
 
-    .fade-in-up {
-      opacity: 0;
-      transform: translateY(20px);
-      animation: fadeInUp 0.8s ease-out forwards;
-    }
+  .fade-in-up {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.6s ease-out forwards;
+  }
+  @keyframes fadeInUp { to { opacity: 1; transform: translateY(0);} }
+  .delay-1{animation-delay:.1s} .delay-2{animation-delay:.2s} .delay-3{animation-delay:.3s}
+  .delay-4{animation-delay:.4s} .delay-5{animation-delay:.5s} .delay-6{animation-delay:.6s}
+  .delay-7{animation-delay:.7s} .delay-8{animation-delay:.8s}
 
-    @keyframes fadeInUp {
-      to { opacity: 1; transform: translateY(0); }
-    }
+  /* ===== Section switching ===== */
+  .page-section { display: none; }
+  .page-section.active { display: block; }
 
-    .delay-1 { animation-delay: 0.1s; }
-    .delay-2 { animation-delay: 0.2s; }
-    .delay-3 { animation-delay: 0.3s; }
-    .delay-4 { animation-delay: 0.4s; }
+  /* ===== Title ===== */
+  .main-title-wrapper { text-align: center; margin-bottom: 2.5rem; }
+  .main-title { font-size: 2.25rem; font-weight: 700; color: #1d4ed8; margin-bottom: .5rem; }
+  .sub-title { font-size: 1.125rem; color: #4b5563; }
 
-    /* ===== Moving Border (แก้ใหม่ ใช้ conic-gradient หมุน + mask) ===== */
-    @property --mb-angle {
-      syntax: '<angle>';
-      inherits: false;
-      initial-value: 0deg;
-    }
+  /* ===== Home / header card ===== */
+  .home-header {
+    background: linear-gradient(to right, #1e293b, #2563eb);
+    color: #fff;
+    text-align: center;
+    padding: 2.5rem 1.5rem;
+    border-radius: 1.25rem;
+    box-shadow: 0 10px 15px -3px rgba(0,0,0,.1);
+    margin-bottom: 2rem;
+  }
+  .home-header h1 { font-size: 2.25rem; font-weight: 700; margin: 0 0 .25rem; }
+  .home-header h2 { font-size: 1.5rem; font-weight: 600; margin: 0 0 .25rem; color: #dbeafe; }
+  .home-header h3 { font-size: 1.05rem; font-weight: 300; margin: 0; color: #bfdbfe; }
 
-    .mb-wrap {
-      position: relative;
-      border-radius: 1rem;      /* ให้ตรงกับ rounded-2xl ของการ์ดด้านใน */
-      isolation: isolate;
-    }
+  .info-card {
+    background: #fff;
+    border-radius: 1rem;
+    box-shadow: 0 10px 15px -3px rgba(0,0,0,.1), 0 4px 6px -2px rgba(0,0,0,.05);
+    border: 1px solid #e5e7eb;
+    padding: 1.5rem;
+  }
+  .info-card h2 { font-size: 1.25rem; font-weight: 600; color: #1f2937; border-bottom: 1px solid #e5e7eb; padding-bottom: .5rem; margin: 0 0 1rem; }
+  .info-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+  @media (min-width: 640px) { .info-grid { grid-template-columns: 1fr 1fr; } }
+  .info-grid p { margin: 0; color: #374151; }
+  .info-grid strong { color: #374151; }
 
-    .mb-wrap::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      box-sizing: border-box;
-      border-radius: inherit;
-      padding: 2.5px;                 /* ความหนาของเส้นขอบ */
-      background: conic-gradient(
-        from var(--mb-angle),
-        transparent 0deg,
-        var(--mb-c, #60a5fa) 40deg,
-        transparent 90deg,
-        transparent 360deg
-      );
-      -webkit-mask:
-        linear-gradient(#fff 0 0) content-box,
-        linear-gradient(#fff 0 0);
-      -webkit-mask-composite: xor;
-              mask-composite: exclude;
-      animation: mb-spin 4s linear infinite;
-      pointer-events: none;
-      z-index: 0;
-    }
+  .home-nav-hint {
+    text-align: center;
+    color: #6b7280;
+    margin-top: 2rem;
+    font-size: .95rem;
+  }
 
-    @keyframes mb-spin {
-      to { --mb-angle: 360deg; }
-    }
+  /* ===== Accordion (shared across ด้านที่ 1-3) ===== */
+  .accordion-wrapper { display: flex; flex-direction: column; gap: 1.5rem; }
+  .accordion-card {
+    background-color: #fff;
+    border-radius: 1rem;
+    box-shadow: 0 10px 15px -3px rgba(0,0,0,.1), 0 4px 6px -2px rgba(0,0,0,.05);
+    overflow: hidden;
+    border: 1px solid #e5e7eb;
+  }
+  .accordion-card input { display: none; }
+  .accordion-label {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 1.5rem; cursor: pointer; width: 100%;
+    transition: background-color .3s ease;
+  }
+  .accordion-label:hover { background-color: #f9fafb; }
+  .accordion-label .title { font-size: 1.15rem; font-weight: 600; color: #374151; }
+  .accordion-label .icon-toggle {
+    font-size: 1.5rem; font-weight: 300; color: #3b82f6; flex-shrink: 0; margin-left: 1rem;
+    transition: transform .4s cubic-bezier(.25,1,.5,1);
+  }
+  .accordion-content { max-height: 0; overflow: hidden; transition: max-height .7s ease-in-out; }
+  .content-inner {
+    padding: 0 1.5rem 1.5rem 1.5rem; border-top: 1px solid #e5e7eb;
+    display: grid; gap: 1.5rem; color: #374151;
+  }
+  .accordion-card input:checked ~ .accordion-content { max-height: 1000px; }
+  .accordion-card input:checked + .accordion-label .icon-toggle { transform: rotate(135deg); }
+  @media (min-width: 768px) { .content-inner { grid-template-columns: repeat(2, minmax(0,1fr)); } }
+  .content-inner h3 { font-weight: 700; color: #1f2937; margin: 0 0 .5rem; }
+  .content-inner ul { list-style: disc; list-style-position: inside; padding-left: 0; margin: 0; display: flex; flex-direction: column; gap: .5rem; }
 
-    .mb-blue   { --mb-c: #3b82f6; }
-    .mb-green  { --mb-c: #22c55e; }
-    .mb-purple { --mb-c: #a855f7; }
-    .mb-indigo { --mb-c: #6366f1; }
-    .mb-pink   { --mb-c: #ec4899; }
+  /* ======================================================
+     FLOATING DOCK NAV (built in vanilla CSS/JS,
+     no framer-motion needed — behaves like the 21st.dev
+     "floating-dock" component: icons magnify near the cursor)
+     ====================================================== */
+  .dock-outer {
+    position: fixed;
+    left: 0; right: 0; bottom: 1.25rem;
+    display: flex; justify-content: center;
+    z-index: 50;
+    pointer-events: none; /* only the dock itself is interactive */
+  }
+  .dock {
+    pointer-events: auto;
+    display: flex;
+    align-items: flex-end;
+    gap: 1rem;
+    height: 4rem;
+    padding: 0 1rem;
+    border-radius: 1.5rem;
+    background: rgba(249, 250, 251, 0.9);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 10px 25px -5px rgba(0,0,0,.15), 0 0 0 1px rgba(0,0,0,.04);
+  }
+  .dock-item {
+    position: relative;
+    width: 40px; height: 40px;
+    margin-bottom: 12px;
+    border-radius: 9999px;
+    background: #e5e7eb;
+    border: none;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem;
+    transition: transform .15s ease-out, background-color .2s ease;
+    transform-origin: bottom center;
+  }
+  .dock-item.active { background: #3b82f6; color: #fff; }
+  .dock-item .dock-tooltip {
+    position: absolute;
+    bottom: 130%;
+    left: 50%;
+    transform: translateX(-50%) translateY(4px);
+    background: #f3f4f6;
+    border: 1px solid #e5e7eb;
+    color: #374151;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: .75rem;
+    white-space: pre;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .15s ease, transform .15s ease;
+  }
+  .dock-item:hover .dock-tooltip { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-    .mb-wrap > .mb-inner {
-      position: relative;
-      z-index: 1;
-      height: 100%;
-    }
-
-    .mb-wrap:hover::before {
-      animation-duration: 1.6s;
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .mb-wrap::before { animation: none; }
-    }
-  </style>
+  @media (prefers-reduced-motion: reduce) {
+    .dock-item { transition: none; }
+  }
+</style>
 </head>
-<body class="bg-gradient-to-br from-gray-100 to-white min-h-screen">
+<body>
 
-  <!-- 🔷 Header E-Portfolio -->
-  <header class="bg-gradient-to-r from-slate-800 to-blue-600 text-white py-10 px-4 text-center shadow-lg border-b-4 border-blue-700 fade-in-up delay-1">
-    <h1 class="text-4xl sm:text-5xl font-bold tracking-wide mb-2">E-Portfolio</h1>
-    <h2 class="text-2xl sm:text-3xl font-semibold text-blue-100">นายตรีทเศศ ไตรโยธี</h2>
-    <h3 class="text-lg sm:text-xl font-light text-blue-200">ครูชำนาญการ โรงเรียนบ้านกกดู่</h3>
-  </header>
+  <div class="container">
 
-  <!-- 🔶 เนื้อหาหลัก -->
-  <div class="max-w-4xl mx-auto py-10 px-6">
+    <!-- ===================== หน้าแรก ===================== -->
+    <section id="home" class="page-section active">
+      <div class="home-header fade-in-up delay-1">
+        <h1>E-Portfolio</h1>
+        <h2>นายตรีทเศศ ไตรโยธี</h2>
+        <h3>ครูชำนาญการ โรงเรียนบ้านกกดู่ | สพป.เลย เขต 1</h3>
+      </div>
 
-    <!-- ชื่อเรื่อง -->
-    <div class="text-center mb-10 fade-in-up delay-1">
-      <h1 class="text-4xl font-bold text-blue-700 mb-2 icon-animate">ข้อตกลงในการพัฒนางาน (PA)</h1>
-      <p class="text-gray-600 text-lg">สำหรับปีงบประมาณ 2568</p>
-    </div>
+      <div class="main-title-wrapper fade-in-up delay-1">
+        <h1 class="main-title">ข้อตกลงในการพัฒนางาน (PA)</h1>
+        <p class="sub-title">สำหรับปีงบประมาณ 2568</p>
+      </div>
 
-    <!-- ข้อมูลส่วนตัว -->
-    <div class="mb-wrap mb-blue fade-in-up delay-1 mb-6">
-      <div class="mb-inner bg-white shadow-xl rounded-2xl p-6">
-        <h2 class="text-xl font-semibold text-gray-800 border-b pb-2 mb-4">
-          <span class="icon-animate">👤</span> ข้อมูลส่วนตัว
-        </h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <p><span class="font-semibold text-gray-700">ชื่อ-สกุล:</span> นายตรีทเศศ ไตรโยธี</p>
-          <p><span class="font-semibold text-gray-700">โรงเรียน:</span> บ้านกกดู่</p>
-          <p><span class="font-semibold text-gray-700">ตำแหน่ง:</span> ครู วิทยฐานะ ครูชำนาญการ</p>
-          <p><span class="font-semibold text-gray-700">สังกัด:</span> สพป.เลย เขต 1</p>
+      <div class="info-card fade-in-up delay-2">
+        <h2>👤 ข้อมูลส่วนตัว</h2>
+        <div class="info-grid">
+          <p><strong>ชื่อ-สกุล:</strong> นายตรีทเศศ ไตรโยธี</p>
+          <p><strong>โรงเรียน:</strong> บ้านกกดู่</p>
+          <p><strong>ตำแหน่ง:</strong> ครู วิทยฐานะ ครูชำนาญการ</p>
+          <p><strong>สังกัด:</strong> สพป.เลย เขต 1</p>
         </div>
       </div>
-    </div>
 
-    <!-- เป้าหมาย -->
-    <div class="mb-wrap mb-green fade-in-up delay-2 mb-6">
-      <div class="mb-inner bg-white shadow-xl rounded-2xl p-6">
-        <h2 class="text-xl font-semibold text-green-600 border-b pb-2 mb-4">
-          <span class="icon-animate">🎯</span> เป้าหมายการพัฒนางาน
-        </h2>
-        <ul class="list-decimal list-inside space-y-2 text-gray-700">
-          <li>พัฒนาผลสัมฤทธิ์ของนักเรียนชั้น ป.4 ในวิชาคอมพิวเตอร์ให้สูงขึ้นไม่น้อยกว่า 10%</li>
-          <li>จัดกิจกรรมการเรียนรู้โดยใช้เทคโนโลยี AI อย่างน้อย 3 บทเรียน</li>
-          <li>เผยแพร่นวัตกรรมการสอนผ่านเว็บไซต์ส่วนตัวหรือ YouTube</li>
-        </ul>
+      <p class="home-nav-hint fade-in-up delay-3">
+        ใช้เมนูด้านล่างเพื่อไปยัง <strong>ด้านที่ ๑ ด้านที่ ๒</strong> และ <strong>ด้านที่ ๓</strong> ของข้อตกลง PA
+      </p>
+    </section>
+
+    <!-- ===================== ด้านที่ ๑ ===================== -->
+    <section id="s1" class="page-section">
+      <div class="main-title-wrapper fade-in-up delay-1">
+        <h1 class="main-title">ด้านที่ ๑</h1>
+        <p class="sub-title">ข้อตกลงในการพัฒนางานตามมาตรฐานตำแหน่ง</p>
       </div>
-    </div>
 
-    <!-- ตัวชี้วัด -->
-    <div class="mb-wrap mb-purple fade-in-up delay-3 mb-6">
-      <div class="mb-inner bg-white shadow-xl rounded-2xl p-6">
-        <h2 class="text-xl font-semibold text-purple-600 border-b pb-2 mb-4">
-          <span class="icon-animate">📈</span> ตัวชี้วัดความสำเร็จ
-        </h2>
-        <ul class="list-disc list-inside text-gray-700 space-y-2">
-          <li>คะแนนเฉลี่ยปลายภาควิชาคอมพิวเตอร์สูงกว่าปีที่ผ่านมา</li>
-          <li>มีผลงานเชิงประจักษ์ เช่น คลิปการสอน บทเรียนออนไลน์</li>
-          <li>ได้รับการรับรองจากหัวหน้าสถานศึกษา</li>
-        </ul>
-      </div>
-    </div>
+      <div class="accordion-wrapper">
+        <div class="accordion-card fade-in-up delay-1">
+          <input type="checkbox" id="acc-1-1">
+          <label class="accordion-label" for="acc-1-1">
+            <span class="title">1.1 การสร้างและหรือการพัฒนาหลักสูตร</span>
+            <span class="icon-toggle">+</span>
+          </label>
+          <div class="accordion-content">
+            <div class="content-inner">
+              <div>
+                <h3>ผลลัพธ์ (Outcomes)</h3>
+                <ul>
+                  <li>ผู้เรียนได้รับการจัดการเรียนรู้ตามหลักสูตรและมีความรู้ตามมาตรฐานและตัวชี้วัด</li>
+                  <li>ผู้เรียนได้รับการพัฒนาคุณลักษณะอันพึงประสงค์ การอ่าน การเขียน คิด วิเคราะห์ สมรรถนะสำคัญของผู้เรียน</li>
+                </ul>
+              </div>
+              <div>
+                <h3>ตัวชี้วัด (Indicators)</h3>
+                <ul>
+                  <li>ร้อยละ ๗๐ ของผู้เรียน มีความรู้ผ่านเกณฑ์การประเมินตามที่สถานศึกษากำหนด</li>
+                  <li>ร้อยละ ๗๐ ของผู้เรียน มีผลสัมฤทธิ์สูงขึ้นเป็นไปตามค่าเป้าหมายที่สถานศึกษากำหนด</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
 
-    <!-- เอกสารประกอบ -->
-    <div class="mb-wrap mb-indigo fade-in-up delay-4 mb-6">
-      <div class="mb-inner bg-white shadow-xl rounded-2xl p-6">
-        <h2 class="text-xl font-semibold text-indigo-600 border-b pb-2 mb-4">
-          <span class="icon-animate">📂</span> เอกสารประกอบ
-        </h2>
-        <div class="space-y-2 text-blue-600">
-          <p>📄 <a href="https://docs.google.com/document/d/1Rt0aiKVu15vALUf57KAbHjpHjprB56rN/edit?usp=sharing&ouid=113631185274247841654&rtpof=true&sd=true" target="_blank" class="underline hover:text-blue-800">แผนการจัดการเรียนรู้ (PDF)</a></p>
-          <p>🎥 <a href="#" target="_blank" class="underline hover:text-blue-800">วิดีโอตัวอย่างการสอน</a></p>
-          <p>🌐 <a href="https://sites.google.com/loei1.go.th/krudin/Home" target="_blank" class="underline hover:text-blue-800">เว็บไซต์นวัตกรรมการสอน</a></p>
+        <div class="accordion-card fade-in-up delay-2">
+          <input type="checkbox" id="acc-1-2">
+          <label class="accordion-label" for="acc-1-2">
+            <span class="title">1.2 การออกแบบการจัดการเรียนรู้</span>
+            <span class="icon-toggle">+</span>
+          </label>
+          <div class="accordion-content">
+            <div class="content-inner">
+              <div>
+                <h3>ผลลัพธ์ (Outcomes)</h3>
+                <ul>
+                  <li>ผู้เรียนมีความรู้ตามมาตรฐานและตัวชี้วัดตามธรรมชาติวิชา</li>
+                  <li>ผู้เรียนได้รับการพัฒนาในด้านคุณลักษณะอันพึงประสงค์และสมรรถนะสำคัญตามหลักสูตร</li>
+                </ul>
+              </div>
+              <div>
+                <h3>ตัวชี้วัด (Indicators)</h3>
+                <ul>
+                  <li>ร้อยละ ๗๐ ของผู้เรียน มีความรู้ผ่านเกณฑ์การประเมินตามที่สถานศึกษากำหนด</li>
+                  <li>ร้อยละ ๗๐ ของผู้เรียนมีผลการประเมินในด้านคุณลักษณะอันพึงประสงค์และสมรรถนะสำคัญตามหลักสูตรสูงขึ้นฯ</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-card fade-in-up delay-3">
+          <input type="checkbox" id="acc-1-3">
+          <label class="accordion-label" for="acc-1-3">
+            <span class="title">1.3 การจัดกิจกรรมการเรียนรู้</span>
+            <span class="icon-toggle">+</span>
+          </label>
+          <div class="accordion-content">
+            <div class="content-inner">
+              <div>
+                <h3>ผลลัพธ์ (Outcomes)</h3>
+                <ul>
+                  <li>ผู้เรียนได้รับการพัฒนาตามศักยภาพความแตกต่างของแต่ละบุคคล</li>
+                  <li>ผู้เรียนมีนิสัยใฝ่เรียนรู้ มุ่งมั่นในการทำงานและสามารถทำงานร่วมกับผู้อื่นได้เป็นอย่างดี</li>
+                  <li>ผู้เรียนเกิดความพึงพอใจต่อการเรียนวิชาวิทยาการคำนวณ มากยิ่งขึ้นฯ</li>
+                </ul>
+              </div>
+              <div>
+                <h3>ตัวชี้วัด (Indicators)</h3>
+                <ul>
+                  <li>ร้อยละ ๗๐ ของผู้เรียน มีความพึงพอใจต่อการเรียนวิชาวิทยาการคำนวณและมีส่วนร่วมในการจัดกิจกรรมฯ</li>
+                  <li>ร้อยละ ๗๐ ของผู้เรียน ร่วมในกิจกรรมการเรียนการสอนแบบเป็นอย่างดี</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-card fade-in-up delay-4">
+          <input type="checkbox" id="acc-1-4">
+          <label class="accordion-label" for="acc-1-4">
+            <span class="title">1.4 การสร้างและพัฒนาสื่อ นวัตกรรม</span>
+            <span class="icon-toggle">+</span>
+          </label>
+          <div class="accordion-content">
+            <div class="content-inner">
+              <div>
+                <h3>ผลลัพธ์ (Outcomes)</h3>
+                <ul>
+                  <li>ผู้เรียนได้รับความรู้จากการใช้สื่อที่หลากหลาย สอดคล้องกับกิจกรรมการเรียนรู้และทันสมัย</li>
+                  <li>ผู้เรียนได้รับความรู้จากการใช้แหล่งเรียนรู้ที่หลากหลายและสอดคล้องกับการเรียนรู้</li>
+                </ul>
+              </div>
+              <div>
+                <h3>ตัวชี้วัด (Indicators)</h3>
+                <ul>
+                  <li>ร้อยละ ๗๐ ของผู้เรียน มีความรู้ผ่านเกณฑ์การประเมินตามที่สถานศึกษากำหนด</li>
+                  <li>ร้อยละ ๗๐ ของผู้เรียนมีผลสัมฤทธิ์สูงขึ้น เป็นไปตามค่าเป้าหมายที่สถานศึกษากำหนด</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-card fade-in-up delay-5">
+          <input type="checkbox" id="acc-1-5">
+          <label class="accordion-label" for="acc-1-5">
+            <span class="title">1.5 การวัดและการประเมินผลการเรียนรู้</span>
+            <span class="icon-toggle">+</span>
+          </label>
+          <div class="accordion-content">
+            <div class="content-inner">
+              <div>
+                <h3>ผลลัพธ์ (Outcomes)</h3>
+                <ul>
+                  <li>ผู้เรียนได้รับการประเมินผลการเรียนรู้อย่างต่อเนื่องหลากหลาย</li>
+                  <li>นำผลการประเมินมาใช้ในการส่งเสริมหรือปรับปรุงแก้ไขการเรียนรู้ของผู้เรียน</li>
+                </ul>
+              </div>
+              <div>
+                <h3>ตัวชี้วัด (Indicators)</h3>
+                <ul>
+                  <li>ร้อยละ ๗๐ ของผู้เรียน มีความรู้ผ่านเกณฑ์การประเมินเป็นไปตามระเบียบการวัดผลฯ</li>
+                  <li>ร้อยละ ๗๐ ของผู้เรียน มีผลสัมฤทธิ์สูงขึ้น เป็นไปตามค่าเป้าหมายที่สถานศึกษากำหนด</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-card fade-in-up delay-6">
+          <input type="checkbox" id="acc-1-6">
+          <label class="accordion-label" for="acc-1-6">
+            <span class="title">1.6 การศึกษา วิเคราะห์ สังเคราะห์ฯ</span>
+            <span class="icon-toggle">+</span>
+          </label>
+          <div class="accordion-content">
+            <div class="content-inner">
+              <div>
+                <h3>ผลลัพธ์ (Outcomes)</h3>
+                <ul>
+                  <li>นักเรียนได้รับการแก้ปัญหาหรือพัฒนาในด้านการเรียนรู้</li>
+                  <li>นักเรียนได้รับการแก้ปัญหาหรือพัฒนาด้านคุณลักษณะอันพึงประสงค์</li>
+                  <li>นักเรียนได้รับการแก้ปัญหาหรือพัฒนาด้านสมรรถนะสำคัญผู้เรียน</li>
+                </ul>
+              </div>
+              <div>
+                <h3>ตัวชี้วัด (Indicators)</h3>
+                <ul>
+                  <li>ร้อยละ ๗๐ ของผู้เรียน มีความรู้ผ่านเกณฑ์การประเมินของสถานศึกษา</li>
+                  <li>ร้อยละ ๗๐ ของผู้เรียน มีผลการประเมินในด้านคุณลักษณะอันพึงประสงค์และสมรรถนะสำคัญตามหลักสูตรที่สูงขึ้นฯ</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-card fade-in-up delay-7">
+          <input type="checkbox" id="acc-1-7">
+          <label class="accordion-label" for="acc-1-7">
+            <span class="title">1.7 การจัดบรรยากาศที่ส่งเสริมและพัฒนาผู้เรียน</span>
+            <span class="icon-toggle">+</span>
+          </label>
+          <div class="accordion-content">
+            <div class="content-inner">
+              <div>
+                <h3>ผลลัพธ์ (Outcomes)</h3>
+                <ul><li>ผู้เรียนได้รับการพัฒนาในด้านสมรรถนะสำคัญของผู้เรียน</li></ul>
+              </div>
+              <div>
+                <h3>ตัวชี้วัด (Indicators)</h3>
+                <ul><li>ร้อยละ ๗๐ ของผู้เรียนมีผลการประเมินในด้านสมรรถนะสำคัญตามหลักสูตรสูงขึ้นเป็นไปตามค่าเป้าหมายฯ</li></ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-card fade-in-up delay-8">
+          <input type="checkbox" id="acc-1-8">
+          <label class="accordion-label" for="acc-1-8">
+            <span class="title">1.8 อบรมและพัฒนาคุณลักษณะที่ดีของผู้เรียน</span>
+            <span class="icon-toggle">+</span>
+          </label>
+          <div class="accordion-content">
+            <div class="content-inner">
+              <div>
+                <h3>ผลลัพธ์ (Outcomes)</h3>
+                <ul><li>ผู้เรียนได้รับการพัฒนาในด้านคุณลักษณะนิสัยอันพึงประสงค์</li></ul>
+              </div>
+              <div>
+                <h3>ตัวชี้วัด (Indicators)</h3>
+                <ul><li>ร้อยละ ๗๐ ของผู้เรียน มีผลการประเมินในด้านคุณลักษณะนิสัยอันพึงประสงค์ ตามหลักสูตรสูงขึ้นเป็นไปตามค่าเป้าหมายฯ</li></ul>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+    </section>
 
-    <!-- ข้อตกลงมาตรฐาน -->
-    <div class="mb-wrap mb-pink fade-in-up delay-4 mb-6">
-      <div class="mb-inner bg-white shadow-xl rounded-2xl p-6">
-        <h2 class="text-xl font-semibold text-pink-600 border-b pb-2 mb-4">📌 ข้อตกลงในการพัฒนางานตามมาตรฐานตำแหน่ง</h2>
-        <div class="text-gray-700 space-y-4">
-          <p><strong>1. ภาระงาน:</strong> เป็นไปตามที่ ก.ค.ศ. กำหนด</p>
-          <p><strong>1.1 ชั่วโมงสอนตามตารางสอน:</strong> รวม <span class="text-blue-600 font-semibold">15 ชั่วโมง/สัปดาห์</span></p>
-          <ul class="list-disc list-inside ml-4 space-y-1">
-            <li>📘 วิทยาการคำนวณ (ป.4 - ม.3): 6 ชั่วโมง/สัปดาห์</li>
-            <li>💻 คอมพิวเตอร์ (เพิ่มเติม): 6 ชั่วโมง/สัปดาห์</li>
-            <li>🧢 ลูกเสือ-เนตรนารี (ม.1): 1 ชั่วโมง/สัปดาห์</li>
-            <li>🖱️ ชุมนุมคอมพิวเตอร์: 1 ชั่วโมง/สัปดาห์</li>
-            <li>🗣️ แนะแนว: 1 ชั่วโมง/สัปดาห์</li>
-          </ul>
+    <!-- ===================== ด้านที่ ๒ ===================== -->
+    <section id="s2" class="page-section">
+      <div class="main-title-wrapper fade-in-up delay-1">
+        <h1 class="main-title">ด้านที่ ๒</h1>
+        <p class="sub-title">ด้านการส่งเสริมและสนับสนุน การจัดการเรียนรู้</p>
+      </div>
+
+      <div class="accordion-wrapper">
+        <div class="accordion-card fade-in-up delay-1">
+          <input type="checkbox" id="acc-2-1">
+          <label class="accordion-label" for="acc-2-1">
+            <span class="title">2.1 จัดทำข้อมูลสารสนเทศของผู้เรียนและรายวิชา</span>
+            <span class="icon-toggle">+</span>
+          </label>
+          <div class="accordion-content">
+            <div class="content-inner">
+              <div>
+                <h3>ผลลัพธ์ (Outcomes)</h3>
+                <ul><li>ผู้เรียนใช้ข้อมูลสารสนเทศตรวจสอบและรายงานผลระบบดูแลช่วยเหลือผู้เรียนผ่านระบบของตนเอง หรือโปรแกรมแบบ ปพ.๕</li></ul>
+              </div>
+              <div>
+                <h3>ตัวชี้วัด (Indicators)</h3>
+                <ul><li>ผู้เรียนร้อยละ ๑๐๐ ได้ใช้ประโยชน์จากสารสนเทศในระบบดูแลช่วยเหลือผู้เรียนด้วยระบบโปรแกรมแบบ ปพ.๕</li></ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-card fade-in-up delay-2">
+          <input type="checkbox" id="acc-2-2">
+          <label class="accordion-label" for="acc-2-2">
+            <span class="title">2.2 ดำเนินการตามระบบดูแลช่วยเหลือผู้เรียน</span>
+            <span class="icon-toggle">+</span>
+          </label>
+          <div class="accordion-content">
+            <div class="content-inner">
+              <div>
+                <h3>ผลลัพธ์ (Outcomes)</h3>
+                <ul>
+                  <li>นักเรียนและผู้ปกครองมีส่วนร่วมในการแก้ไขปัญหาด้านการเรียนรู้และระบบดูแลช่วยเหลือนักเรียน</li>
+                  <li>นักเรียนได้รับการสนับสนุนช่วยเหลือดูแลทั้งด้านวิชาการ ลักษณะนิสัยอันพึงประสงค์ และสมรรถนะสำคัญ</li>
+                  <li>นักเรียนได้รับการแก้ไข พัฒนา ด้านวิชาการ ลักษณะอันพึงประสงค์ รวมทั้งสมรรถนะสำคัญผู้เรียน</li>
+                </ul>
+              </div>
+              <div>
+                <h3>ตัวชี้วัด (Indicators)</h3>
+                <ul><li>ครู ผู้ปกครอง และผู้ที่เกี่ยวข้องร้อยละ ๑๐๐ สามารถรับรู้ความก้าวหน้าพัฒนาการของผู้เรียนและสามารถช่วยเหลือนักเรียนได้อย่างทั่วถึง</li></ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-card fade-in-up delay-3">
+          <input type="checkbox" id="acc-2-3">
+          <label class="accordion-label" for="acc-2-3">
+            <span class="title">2.3 ปฏิบัติงานวิชาการ และงานอื่นๆ ของสถานศึกษา</span>
+            <span class="icon-toggle">+</span>
+          </label>
+          <div class="accordion-content">
+            <div class="content-inner">
+              <div>
+                <h3>ผลลัพธ์ (Outcomes)</h3>
+                <ul>
+                  <li>ผู้เรียนมีความรู้ ตามมาตรฐานและตัวชี้วัด</li>
+                  <li>ผู้เรียนได้รับการพัฒนาที่ดีขึ้น</li>
+                </ul>
+              </div>
+              <div>
+                <h3>ตัวชี้วัด (Indicators)</h3>
+                <ul>
+                  <li>ร้อยละ ๗๐ ของผู้เรียน มีความรู้ผ่านเกณฑ์การประเมินเป็นไปตามระเบียบการวัดผลประเมินผลของสถานศึกษา</li>
+                  <li>ร้อยละ ๗๐ ของผู้เรียนมีผลสัมฤทธิ์สูงขึ้นเป็นไปตามค่าเป้าหมายของสถานศึกษากำหนด</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-card fade-in-up delay-4">
+          <input type="checkbox" id="acc-2-4">
+          <label class="accordion-label" for="acc-2-4">
+            <span class="title">2.4 ประสานความร่วมมือกับผู้ปกครอง ภาคีเครือข่ายฯ</span>
+            <span class="icon-toggle">+</span>
+          </label>
+          <div class="accordion-content">
+            <div class="content-inner">
+              <div>
+                <h3>ผลลัพธ์ (Outcomes)</h3>
+                <ul>
+                  <li>นักเรียนได้รับการสนับสนุนช่วยเหลือดูแลทั้งด้านวิชาการ ลักษณะนิสัยอันพึงประสงค์ รวมทั้งสมรรถสำคัญผู้เรียน</li>
+                  <li>นักเรียนได้รับการแก้ไขหรือพัฒนาทั้งด้านวิชาการ ลักษณะนิสัยอันพึงประสงค์ รวมทั้งสมรรถสำคัญผู้เรียน</li>
+                </ul>
+              </div>
+              <div>
+                <h3>ตัวชี้วัด (Indicators)</h3>
+                <ul>
+                  <li>ร้อยละ ๗๐ ของผู้เรียน มีความรู้ผ่านเกณฑ์การประเมินของสถานศึกษา</li>
+                  <li>ร้อยละ ๗๐ ของผู้เรียน มีผลการประเมินในด้านคุณลักษณะอันพึงประสงค์ตามหลักสูตรสูงขึ้น เป็นไปตามค่าเป้าหมายที่สถานศึกษากำหนด</li>
+                </ul>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+    </section>
 
-    <!-- ประเด็นท้าทาย -->
-    <div class="mb-wrap mb-pink fade-in-up delay-4 mb-6">
-      <div class="mb-inner bg-white shadow-xl rounded-2xl p-6">
-        <h2 class="text-xl font-semibold text-pink-600 border-b pb-2 mb-4">📌 ข้อตกลงที่เป็นประเด็นท้าทาย</h2>
-        <div class="text-gray-700 space-y-4">
-          <p><strong>เรื่อง:</strong> การพัฒนาความน่าเชื่อถือของข้อมูลผ่านเกม (Play-based learning)</p>
+    <!-- ===================== ด้านที่ ๓ ===================== -->
+    <section id="s3" class="page-section">
+      <div class="main-title-wrapper fade-in-up delay-1">
+        <h1 class="main-title">ด้านที่ ๓</h1>
+        <p class="sub-title">ด้านการพัฒนาตนเองและวิชาชีพ</p>
+      </div>
 
-          <p><strong>1. สภาพปัญหา:</strong></p>
-          <ul class="list-disc ml-4 space-y-1">
-            <li>ผู้เรียนยังมีปัญหาในการคิดเชิงคำนวณ จึงใช้เกมและเว็บไซต์เสริมการเรียนรู้</li>
-          </ul>
+      <div class="accordion-wrapper">
+        <div class="accordion-card fade-in-up delay-1">
+          <input type="checkbox" id="acc-3-1">
+          <label class="accordion-label" for="acc-3-1">
+            <span class="title">3.1 พัฒนาตนเองอย่างเป็นระบบและต่อเนื่อง</span>
+            <span class="icon-toggle">+</span>
+          </label>
+          <div class="accordion-content">
+            <div class="content-inner">
+              <div>
+                <h3>ผลลัพธ์ (Outcomes)</h3>
+                <ul>
+                  <li>นักเรียนได้รับการแก้ปัญหาหรือพัฒนาในด้านการเรียนรู้</li>
+                  <li>นักเรียนได้รับการแก้ปัญหาหรือพัฒนาด้านคุณลักษณะอันพึงประสงค์</li>
+                  <li>นักเรียนได้รับการแก้ปัญหาหรือพัฒนาด้านสมรรถนะสำคัญผู้เรียน</li>
+                </ul>
+              </div>
+              <div>
+                <h3>ตัวชี้วัด (Indicators)</h3>
+                <ul>
+                  <li>ร้อยละ ๗๐ ของผู้เรียน มีความรู้ผ่านเกณฑ์การประเมินของสถานศึกษา</li>
+                  <li>ร้อยละ ๗๐ ของผู้เรียน มีผลการประเมินในด้านคุณลักษณะอันพึงประสงค์และสมรรถนะสำคัญตามหลักสูตร เป็นไปตามค่าเป้าหมายที่สถานศึกษากำหนด</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
 
-          <p><strong>2. วิธีการดำเนินการ:</strong></p>
-          <ul class="list-disc ml-4 space-y-1">
-            <li>เปิดโอกาสให้ผู้เรียนมีส่วนร่วมสูงสุด</li>
-            <li>ส่งเสริมการคิดขั้นสูง การรับผิดชอบร่วมกัน และการมีวินัย</li>
-          </ul>
+        <div class="accordion-card fade-in-up delay-2">
+          <input type="checkbox" id="acc-3-2">
+          <label class="accordion-label" for="acc-3-2">
+            <span class="title">3.2 การมีส่วนร่วมแลกเปลี่ยนเรียนรู้ทางวิชาชีพ</span>
+            <span class="icon-toggle">+</span>
+          </label>
+          <div class="accordion-content">
+            <div class="content-inner">
+              <div>
+                <h3>ผลลัพธ์ (Outcomes)</h3>
+                <ul>
+                  <li>นักเรียนได้รับการสนับสนุนช่วยเหลือดูแล ทั้งด้านวิชาการลักษณะนิสัยอันพึงประสงค์ รวมทั้งสมรรถสำคัญผู้เรียน</li>
+                  <li>นักเรียนได้รับการแก้ไขหรือพัฒนาทั้งด้านวิชาการลักษณะนิสัยอันพึงประสงค์ รวมทั้งสมรรถนะสำคัญผู้เรียน</li>
+                </ul>
+              </div>
+              <div>
+                <h3>ตัวชี้วัด (Indicators)</h3>
+                <ul>
+                  <li>ร้อยละ ๗๐ ของผู้เรียน มีความรู้ผ่านเกณฑ์การประเมินของสถานศึกษา</li>
+                  <li>ร้อยละ ๗๐ ของผู้เรียน มีผลการประเมินในด้านคุณลักษณะอันพึงประสงค์และสมรรถนะสำคัญตามหลักสูตร เป็นไปตามค่าเป้าหมายที่สถานศึกษากำหนด</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
 
-          <p><strong>3. ผลลัพธ์ที่คาดหวัง:</strong></p>
-          <ul class="list-disc ml-4 space-y-1">
-            <li>ร้อยละ 70 ผ่านเกณฑ์</li>
-            <li>มีเทคนิค/สื่อที่เหมาะสมต่อกระบวนการเรียนรู้</li>
-          </ul>
+        <div class="accordion-card fade-in-up delay-3">
+          <input type="checkbox" id="acc-3-3">
+          <label class="accordion-label" for="acc-3-3">
+            <span class="title">3.3 นำความรู้ ความสามารถ ทักษะมาใช้ในการพัฒนา</span>
+            <span class="icon-toggle">+</span>
+          </label>
+          <div class="accordion-content">
+            <div class="content-inner">
+              <div>
+                <h3>ผลลัพธ์ (Outcomes)</h3>
+                <ul>
+                  <li>นำทักษะและองค์ความรู้มาบูรณาการสอดแทรกในเนื้อหาสาระวิชาในการจัดการเรียนรู้ หรือปรับประยุกต์และพัฒนานวัตกรรมการเรียนรู้ให้สอดคล้องกับความแตกต่างระหว่างบุคคล</li>
+                  <li>ร่วมกิจกรรมชุมชนการเรียนรู้ทางวิชาชีพ แลกเปลี่ยนปัญหาในการจัดการเรียนการสอนของผู้เรียนที่หลากหลาย</li>
+                </ul>
+              </div>
+              <div>
+                <h3>ตัวชี้วัด (Indicators)</h3>
+                <ul>
+                  <li>ร้อยละ ๗๐ ของผู้เรียน มีผลสัมฤทธิ์รายวิชาวิทยาการคำนวณในระดับคุณภาพ ๓ ขึ้นไป</li>
+                  <li>ร้อยละ ๗๐ ของผู้เรียน ได้รับการพัฒนาทักษะการคิดวิเคราะห์จากนวัตกรรมที่ครูผู้สอนประยุกต์ใช้ เช่น เว็บไซต์และสื่อการเรียนรู้ E-book แบบ Play base Learning, E-Book เป็นต้น</li>
+                </ul>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-
-    <!-- Footer -->
-    <div class="text-center mt-10 text-sm text-gray-500 fade-in-up delay-4">
-      ปรับปรุงล่าสุด: 15 พฤษภาคม 2568 | พัฒนาโดย <strong>ครูตรีทเศศ ไตรโยธี</strong>
-    </div>
+    </section>
 
   </div>
+
+  <!-- ===================== Floating dock (nav) ===================== -->
+  <div class="dock-outer">
+    <nav class="dock" id="dock">
+      <button class="dock-item active" data-target="home" title="หน้าแรก">
+        🏠
+        <span class="dock-tooltip">หน้าแรก</span>
+      </button>
+      <button class="dock-item" data-target="s1" title="ด้านที่ ๑">
+        ๑
+        <span class="dock-tooltip">ด้านที่ ๑</span>
+      </button>
+      <button class="dock-item" data-target="s2" title="ด้านที่ ๒">
+        ๒
+        <span class="dock-tooltip">ด้านที่ ๒</span>
+      </button>
+      <button class="dock-item" data-target="s3" title="ด้านที่ ๓">
+        ๓
+        <span class="dock-tooltip">ด้านที่ ๓</span>
+      </button>
+    </nav>
+  </div>
+
+  <script>
+    // ---- Section switching ----
+    var sections = document.querySelectorAll('.page-section');
+    var dockItems = document.querySelectorAll('.dock-item');
+
+    function showSection(id) {
+      sections.forEach(function (sec) {
+        sec.classList.toggle('active', sec.id === id);
+      });
+      dockItems.forEach(function (btn) {
+        btn.classList.toggle('active', btn.getAttribute('data-target') === id);
+      });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    dockItems.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        showSection(btn.getAttribute('data-target'));
+      });
+    });
+
+    // ---- Dock magnification effect (mac-dock style, vanilla JS) ----
+    var dock = document.getElementById('dock');
+    var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (!reduceMotion) {
+      dock.addEventListener('mousemove', function (e) {
+        var items = dock.querySelectorAll('.dock-item');
+        items.forEach(function (item) {
+          var rect = item.getBoundingClientRect();
+          var center = rect.left + rect.width / 2;
+          var dist = Math.abs(e.clientX - center);
+          var maxDist = 120;
+          var scale = 1;
+          if (dist < maxDist) {
+            scale = 1 + (1 - dist / maxDist) * 0.7; // up to 1.7x
+          }
+          item.style.transform = 'scale(' + scale.toFixed(2) + ')';
+        });
+      });
+
+      dock.addEventListener('mouseleave', function () {
+        var items = dock.querySelectorAll('.dock-item');
+        items.forEach(function (item) { item.style.transform = ''; });
+      });
+    }
+  </script>
+
 </body>
 </html>
