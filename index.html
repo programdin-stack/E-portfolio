@@ -166,6 +166,56 @@
   @media (prefers-reduced-motion: reduce) {
     .dock-item { transition: none; }
   }
+
+  /* ======================================================
+     MOVING BORDER glow (conic-gradient rotate + mask)
+     — the "ลูกเล่น" glowing card effect from before
+     ====================================================== */
+  @property --mb-angle {
+    syntax: '<angle>';
+    inherits: false;
+    initial-value: 0deg;
+  }
+  .mb-wrap { position: relative; border-radius: 1rem; isolation: isolate; }
+  .mb-wrap::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    box-sizing: border-box;
+    border-radius: inherit;
+    padding: 2.5px;
+    background: conic-gradient(
+      from var(--mb-angle),
+      transparent 0deg,
+      var(--mb-c, #60a5fa) 40deg,
+      transparent 90deg,
+      transparent 360deg
+    );
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+            mask-composite: exclude;
+    animation: mb-spin 4s linear infinite;
+    pointer-events: none;
+    z-index: 0;
+  }
+  @keyframes mb-spin { to { --mb-angle: 360deg; } }
+  .mb-blue   { --mb-c: #3b82f6; }
+  .mb-green  { --mb-c: #22c55e; }
+  .mb-purple { --mb-c: #a855f7; }
+  .mb-indigo { --mb-c: #6366f1; }
+  .mb-pink   { --mb-c: #ec4899; }
+  .mb-wrap > .mb-inner { position: relative; z-index: 1; height: 100%; }
+  .mb-wrap:hover::before { animation-duration: 1.6s; }
+  @media (prefers-reduced-motion: reduce) {
+    .mb-wrap::before { animation: none; }
+  }
+
+  /* ===== Generic content card (reused for goals / indicators / docs / etc.) ===== */
+  .doc-links { display: flex; flex-direction: column; gap: .5rem; }
+  .doc-links a { color: #2563eb; text-decoration: underline; }
+  .doc-links a:hover { color: #1e40af; }
+  .info-card ul { margin: 0; padding-left: 1.25rem; color: #374151; display: flex; flex-direction: column; gap: .5rem; }
+  .info-card .hours-badge { color: #2563eb; font-weight: 600; }
 </style>
 </head>
 <body>
@@ -185,19 +235,98 @@
         <p class="sub-title">สำหรับปีงบประมาณ 2568</p>
       </div>
 
-      <div class="info-card fade-in-up delay-2">
-        <h2>👤 ข้อมูลส่วนตัว</h2>
-        <div class="info-grid">
-          <p><strong>ชื่อ-สกุล:</strong> นายตรีทเศศ ไตรโยธี</p>
-          <p><strong>โรงเรียน:</strong> บ้านกกดู่</p>
-          <p><strong>ตำแหน่ง:</strong> ครู วิทยฐานะ ครูชำนาญการ</p>
-          <p><strong>สังกัด:</strong> สพป.เลย เขต 1</p>
+      <!-- ข้อมูลส่วนตัว -->
+      <div class="mb-wrap mb-blue fade-in-up delay-1" style="margin-bottom:1.5rem;">
+        <div class="mb-inner info-card">
+          <h2>👤 ข้อมูลส่วนตัว</h2>
+          <div class="info-grid">
+            <p><strong>ชื่อ-สกุล:</strong> นายตรีทเศศ ไตรโยธี</p>
+            <p><strong>โรงเรียน:</strong> บ้านกกดู่</p>
+            <p><strong>ตำแหน่ง:</strong> ครู วิทยฐานะ ครูชำนาญการ</p>
+            <p><strong>สังกัด:</strong> สพป.เลย เขต 1</p>
+          </div>
         </div>
       </div>
 
-      <p class="home-nav-hint fade-in-up delay-3">
+      <!-- เป้าหมายการพัฒนางาน -->
+      <div class="mb-wrap mb-green fade-in-up delay-2" style="margin-bottom:1.5rem;">
+        <div class="mb-inner info-card">
+          <h2 style="color:#16a34a;">🎯 เป้าหมายการพัฒนางาน</h2>
+          <ul>
+            <li>พัฒนาผลสัมฤทธิ์ของนักเรียนชั้น ป.4 ในวิชาคอมพิวเตอร์ให้สูงขึ้นไม่น้อยกว่า 10%</li>
+            <li>จัดกิจกรรมการเรียนรู้โดยใช้เทคโนโลยี AI อย่างน้อย 3 บทเรียน</li>
+            <li>เผยแพร่นวัตกรรมการสอนผ่านเว็บไซต์ส่วนตัวหรือ YouTube</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- ตัวชี้วัดความสำเร็จ -->
+      <div class="mb-wrap mb-purple fade-in-up delay-3" style="margin-bottom:1.5rem;">
+        <div class="mb-inner info-card">
+          <h2 style="color:#9333ea;">📈 ตัวชี้วัดความสำเร็จ</h2>
+          <ul>
+            <li>คะแนนเฉลี่ยปลายภาควิชาคอมพิวเตอร์สูงกว่าปีที่ผ่านมา</li>
+            <li>มีผลงานเชิงประจักษ์ เช่น คลิปการสอน บทเรียนออนไลน์</li>
+            <li>ได้รับการรับรองจากหัวหน้าสถานศึกษา</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- เอกสารประกอบ -->
+      <div class="mb-wrap mb-indigo fade-in-up delay-4" style="margin-bottom:1.5rem;">
+        <div class="mb-inner info-card">
+          <h2 style="color:#4f46e5;">📂 เอกสารประกอบ</h2>
+          <div class="doc-links">
+            <p>📄 <a href="https://docs.google.com/document/d/1Rt0aiKVu15vALUf57KAbHjpHjprB56rN/edit?usp=sharing&ouid=113631185274247841654&rtpof=true&sd=true" target="_blank">แผนการจัดการเรียนรู้ (PDF)</a></p>
+            <p>🎥 <a href="#" target="_blank">วิดีโอตัวอย่างการสอน</a></p>
+            <p>🌐 <a href="https://sites.google.com/loei1.go.th/krudin/Home" target="_blank">เว็บไซต์นวัตกรรมการสอน</a></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ข้อตกลงในการพัฒนางานตามมาตรฐานตำแหน่ง -->
+      <div class="mb-wrap mb-pink fade-in-up delay-5" style="margin-bottom:1.5rem;">
+        <div class="mb-inner info-card">
+          <h2 style="color:#db2777;">📌 ข้อตกลงในการพัฒนางานตามมาตรฐานตำแหน่ง</h2>
+          <p><strong>1. ภาระงาน:</strong> เป็นไปตามที่ ก.ค.ศ. กำหนด</p>
+          <p><strong>1.1 ชั่วโมงสอนตามตารางสอน:</strong> รวม <span class="hours-badge">15 ชั่วโมง/สัปดาห์</span></p>
+          <ul>
+            <li>📘 วิทยาการคำนวณ (ป.4 - ม.3): 6 ชั่วโมง/สัปดาห์</li>
+            <li>💻 คอมพิวเตอร์ (เพิ่มเติม): 6 ชั่วโมง/สัปดาห์</li>
+            <li>🧢 ลูกเสือ-เนตรนารี (ม.1): 1 ชั่วโมง/สัปดาห์</li>
+            <li>🖱️ ชุมนุมคอมพิวเตอร์: 1 ชั่วโมง/สัปดาห์</li>
+            <li>🗣️ แนะแนว: 1 ชั่วโมง/สัปดาห์</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- ข้อตกลงที่เป็นประเด็นท้าทาย -->
+      <div class="mb-wrap mb-pink fade-in-up delay-6" style="margin-bottom:1.5rem;">
+        <div class="mb-inner info-card">
+          <h2 style="color:#db2777;">📌 ข้อตกลงที่เป็นประเด็นท้าทาย</h2>
+          <p><strong>เรื่อง:</strong> การพัฒนาความน่าเชื่อถือของข้อมูลผ่านเกม (Play-based learning)</p>
+          <p><strong>1. สภาพปัญหา:</strong></p>
+          <ul><li>ผู้เรียนยังมีปัญหาในการคิดเชิงคำนวณ จึงใช้เกมและเว็บไซต์เสริมการเรียนรู้</li></ul>
+          <p><strong>2. วิธีการดำเนินการ:</strong></p>
+          <ul>
+            <li>เปิดโอกาสให้ผู้เรียนมีส่วนร่วมสูงสุด</li>
+            <li>ส่งเสริมการคิดขั้นสูง การรับผิดชอบร่วมกัน และการมีวินัย</li>
+          </ul>
+          <p><strong>3. ผลลัพธ์ที่คาดหวัง:</strong></p>
+          <ul>
+            <li>ร้อยละ 70 ผ่านเกณฑ์</li>
+            <li>มีเทคนิค/สื่อที่เหมาะสมต่อกระบวนการเรียนรู้</li>
+          </ul>
+        </div>
+      </div>
+
+      <p class="home-nav-hint fade-in-up delay-7">
         ใช้เมนูด้านล่างเพื่อไปยัง <strong>ด้านที่ ๑ ด้านที่ ๒</strong> และ <strong>ด้านที่ ๓</strong> ของข้อตกลง PA
       </p>
+
+      <div class="fade-in-up delay-8" style="text-align:center; margin-top:2rem; font-size:.85rem; color:#9ca3af;">
+        ปรับปรุงล่าสุด: 15 พฤษภาคม 2568 | พัฒนาโดย <strong>ครูตรีทเศศ ไตรโยธี</strong>
+      </div>
     </section>
 
     <!-- ===================== ด้านที่ ๑ ===================== -->
