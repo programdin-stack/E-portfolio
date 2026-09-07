@@ -16,7 +16,7 @@
     min-height: 100vh;
   }
 
-  .container { max-width: 56rem; margin: auto; }
+  .container { max-width: 56rem; margin: auto; position: relative; z-index: 1; }
 
   /* ===== Animations ===== */
   .icon-animate { display: inline-block; animation: bounce 2s infinite; }
@@ -216,9 +216,21 @@
   .doc-links a:hover { color: #1e40af; }
   .info-card ul { margin: 0; padding-left: 1.25rem; color: #374151; display: flex; flex-direction: column; gap: .5rem; }
   .info-card .hours-badge { color: #2563eb; font-weight: 600; }
+
+  /* ===== Background Ripple Grid ===== */
+  #bg-ripple-canvas {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    pointer-events: none;
+  }
 </style>
 </head>
 <body>
+
+  <canvas id="bg-ripple-canvas"></canvas>
 
   <div class="container">
 
@@ -801,6 +813,95 @@
         items.forEach(function (item) { item.style.transform = ''; });
       });
     }
+
+    // ---- Background Ripple Grid effect ----
+    (function () {
+      var canvas = document.getElementById('bg-ripple-canvas');
+      if (!canvas) return;
+      var ctx = canvas.getContext('2d');
+      var W, H;
+      var cellSize = 42;
+      var ripples = [];
+      var colors = ['59,130,246', '34,197,94', '168,85,247', '99,102,241', '236,72,153'];
+      var lastAuto = 0;
+      var lastMouse = 0;
+
+      function resize() {
+        W = canvas.width = window.innerWidth;
+        H = canvas.height = document.documentElement.scrollHeight;
+      }
+      window.addEventListener('resize', resize);
+      resize();
+
+      function addRipple(x, y) {
+        ripples.push({
+          x: x,
+          y: y,
+          start: performance.now(),
+          color: colors[Math.floor(Math.random() * colors.length)]
+        });
+        if (ripples.length > 6) ripples.shift();
+      }
+
+      document.addEventListener('mousemove', function (e) {
+        var now = performance.now();
+        if (now - lastMouse < 90) return;
+        lastMouse = now;
+        addRipple(e.clientX, e.clientY + window.scrollY);
+      });
+
+      document.addEventListener('click', function (e) {
+        addRipple(e.clientX, e.clientY + window.scrollY);
+      });
+
+      function tick(now) {
+        ctx.clearRect(0, 0, W, H);
+
+        // คลื่นสุ่มขึ้นเองเรื่อยๆ ให้มีลูกเล่นตลอดเวลา
+        if (now - lastAuto > 1800) {
+          lastAuto = now;
+          addRipple(Math.random() * W, Math.random() * H);
+        }
+
+        ripples = ripples.filter(function (r) { return now - r.start < 2600; });
+
+        var cols = Math.ceil(W / cellSize);
+        var rows = Math.ceil(H / cellSize);
+
+        for (var i = 0; i < cols; i++) {
+          for (var j = 0; j < rows; j++) {
+            var cx = i * cellSize + cellSize / 2;
+            var cy = j * cellSize + cellSize / 2;
+
+            var maxAlpha = 0;
+            var col = null;
+
+            for (var k = 0; k < ripples.length; k++) {
+              var r = ripples[k];
+              var age = now - r.start;
+              var radius = age * 0.5;
+              var dist = Math.hypot(cx - r.x, cy - r.y);
+              var ring = Math.abs(dist - radius);
+              if (ring < 40) {
+                var a = (1 - ring / 40) * (1 - age / 2600);
+                if (a > maxAlpha) { maxAlpha = a; col = r.color; }
+              }
+            }
+
+            ctx.fillStyle = 'rgba(148,163,184,0.06)';
+            ctx.fillRect(i * cellSize + 2, j * cellSize + 2, cellSize - 4, cellSize - 4);
+
+            if (maxAlpha > 0.02 && col) {
+              ctx.fillStyle = 'rgba(' + col + ',' + Math.min(maxAlpha, 0.55) + ')';
+              ctx.fillRect(i * cellSize + 2, j * cellSize + 2, cellSize - 4, cellSize - 4);
+            }
+          }
+        }
+
+        requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    })();
   </script>
 
 </body>
