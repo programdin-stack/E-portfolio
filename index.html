@@ -22,18 +22,32 @@
   .icon-animate { display: inline-block; animation: bounce 2s infinite; }
   @keyframes bounce { 0%,100% { transform: translateY(0);} 50% { transform: translateY(-5px);} }
 
-  /* ===== Scroll-reveal (was: play-once on load, now: plays when scrolled into view) ===== */
+  /* ===== Scroll-reveal (plays when scrolled into view; also plays on load for above-the-fold cards) ===== */
   .fade-in-up {
     opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+    transform: translateY(28px) scale(.96) rotate(-1deg);
+    transition: opacity .6s cubic-bezier(.22,1,.36,1), transform .6s cubic-bezier(.22,1,.36,1);
   }
-  .fade-in-up.is-visible { opacity: 1; transform: translateY(0); }
+  .fade-in-up.is-visible { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); }
   .delay-1{transition-delay:.1s} .delay-2{transition-delay:.2s} .delay-3{transition-delay:.3s}
   .delay-4{transition-delay:.4s} .delay-5{transition-delay:.5s} .delay-6{transition-delay:.6s}
   .delay-7{transition-delay:.7s} .delay-8{transition-delay:.8s}
   @media (prefers-reduced-motion: reduce) {
     .fade-in-up { transition: none; opacity: 1; transform: none; }
+  }
+
+  /* ===== Playful hover lift on cards ===== */
+  .info-card, .accordion-card {
+    transition: transform .25s ease, box-shadow .25s ease;
+  }
+  .mb-wrap:hover .info-card,
+  .accordion-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 25px -5px rgba(0,0,0,.12), 0 8px 10px -6px rgba(0,0,0,.08);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .info-card, .accordion-card { transition: none; }
+    .mb-wrap:hover .info-card, .accordion-card:hover { transform: none; }
   }
 
   /* ===== Section switching ===== */
@@ -956,7 +970,15 @@
           }
         });
       }, { threshold: 0.12 });
-      revealTargets.forEach(function (el) { revealObserver.observe(el); });
+
+      // รอให้เบราว์เซอร์วาดสถานะ "ซ่อน" (opacity:0) ไปหนึ่งเฟรมก่อน แล้วค่อยเริ่ม observe
+      // ไม่งั้นการ์ดที่อยู่ในจอตั้งแต่โหลดหน้า (เช่นการ์ดหน้าแรก) จะโดน mark ว่า "เห็นแล้ว"
+      // ตั้งแต่เฟรมแรกเลย ทำให้ transition ถูกข้ามไปและดูเหมือนไม่มี fade-in
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          revealTargets.forEach(function (el) { revealObserver.observe(el); });
+        });
+      });
     })();
 
     // ---- Count-up numbers (ตัวเลข/เลขไทยที่มีความหมายเชิงสถิติ) ----
