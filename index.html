@@ -32,9 +32,7 @@
   .delay-1{transition-delay:.1s} .delay-2{transition-delay:.2s} .delay-3{transition-delay:.3s}
   .delay-4{transition-delay:.4s} .delay-5{transition-delay:.5s} .delay-6{transition-delay:.6s}
   .delay-7{transition-delay:.7s} .delay-8{transition-delay:.8s} .delay-9{transition-delay:.9s}
-  @media (prefers-reduced-motion: reduce) {
-    .fade-in-up { transition: none; opacity: 1; transform: none; }
-  }
+  
 
   /* ===== Playful hover lift + 3D tilt on cards (transform driven by JS) ===== */
   .info-card, .accordion-card {
@@ -47,9 +45,7 @@
   .accordion-card:hover {
     box-shadow: 0 20px 25px -5px rgba(0,0,0,.12), 0 8px 10px -6px rgba(0,0,0,.08);
   }
-  @media (prefers-reduced-motion: reduce) {
-    .info-card, .accordion-card { transition: none; }
-  }
+  
 
   /* ===== Cursor spotlight glow (subtle, follows mouse inside the card) ===== */
   .info-card::before, .accordion-card::before {
@@ -65,9 +61,7 @@
   }
   .info-card:hover::before, .accordion-card:hover::before { opacity: 1; }
   .info-card > *, .accordion-card > * { position: relative; z-index: 1; }
-  @media (prefers-reduced-motion: reduce) {
-    .info-card::before, .accordion-card::before { display: none; }
-  }
+  
 
   /* ===== Section switching (instant swap + quick CSS pop-in) ===== */
   .page-section { display: none; }
@@ -76,9 +70,7 @@
     from { opacity: 0; transform: translateY(14px); }
     to { opacity: 1; transform: translateY(0); }
   }
-  @media (prefers-reduced-motion: reduce) {
-    .page-section.active { animation: none; }
-  }
+  
 
   /* ===== Section switching (base rules; cross-fade transition defined further below) ===== */
 
@@ -209,9 +201,7 @@
   }
   .dock-item:hover .dock-tooltip { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-  @media (prefers-reduced-motion: reduce) {
-    .dock-item { transition: none; }
-  }
+  
 
   /* ======================================================
      MOVING BORDER glow (conic-gradient rotate + mask)
@@ -252,9 +242,7 @@
   .mb-pink   { --mb-c: #ec4899; }
   .mb-wrap > .mb-inner { position: relative; z-index: 1; height: 100%; }
   .mb-wrap:hover::before { animation-duration: 1.6s; }
-  @media (prefers-reduced-motion: reduce) {
-    .mb-wrap::before { animation: none; }
-  }
+  
 
   /* ===== Generic content card (reused for goals / indicators / docs / etc.) ===== */
   .doc-links { display: flex; flex-direction: column; gap: .5rem; }
@@ -308,17 +296,13 @@
   #mini-header .mh-name { font-weight: 600; color: #1d4ed8; }
   #mini-header .mh-sep { color: #9ca3af; }
   #mini-header .mh-section { color: #6b7280; }
-  @media (prefers-reduced-motion: reduce) {
-    #mini-header { transition: none; }
-  }
+  
 
   /* ===== Count-up numbers ===== */
   .count-up { font-variant-numeric: tabular-nums; display: inline-block; }
   @keyframes countPop { 0% { transform: scale(1); } 45% { transform: scale(1.4); color: #f97316; } 100% { transform: scale(1); } }
   .count-up.cg-pop { animation: countPop .5s ease; }
-  @media (prefers-reduced-motion: reduce) {
-    .count-up.cg-pop { animation: none; }
-  }
+  
 
   /* ===== Click ripple (material-style) ===== */
   .ripple-el { position: relative; }
@@ -338,9 +322,7 @@
     pointer-events: none;
   }
   @keyframes rippleAnim { to { transform: scale(2.6); opacity: 0; } }
-  @media (prefers-reduced-motion: reduce) {
-    .ripple-layer .ripple { display: none; }
-  }
+  
 
   /* ===== Confetti easter egg ===== */
   .confetti-piece {
@@ -427,10 +409,7 @@
   .cg-progress { width: 100%; max-width: 220px; height: 3px; background: rgba(0,0,0,.08); border-radius: 9999px; margin-top: .9rem; overflow: hidden; }
   .cg-progress-bar { height: 100%; width: 0%; background: linear-gradient(to right, #f97316, #ec4899); border-radius: inherit; }
   .cg-progress-bar.cg-animating { transition: width 5s linear; width: 100%; }
-  @media (prefers-reduced-motion: reduce) {
-    .cg-img, .cg-caption, .cg-word, .cg-progress-bar { transition: none; animation: none; opacity: 1; filter: none; transform: none; }
-    .cg-img.cg-hidden { opacity: 0; }
-  }
+  
 </style>
 </head>
 <body>
@@ -1045,7 +1024,7 @@
 
     // ---- Dock magnification effect (mac-dock style, vanilla JS) ----
     var dock = document.getElementById('dock');
-    var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var reduceMotion = false; // ปิดการเช็ค prefers-reduced-motion ไว้ก่อน ให้ animation เล่นเสมอ
 
     if (!reduceMotion) {
       dock.addEventListener('mousemove', function (e) {
