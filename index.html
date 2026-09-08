@@ -36,19 +36,19 @@
     .fade-in-up { transition: none; opacity: 1; transform: none; }
   }
 
-  /* ===== Playful hover lift on cards ===== */
+  /* ===== Playful hover lift + 3D tilt on cards (transform driven by JS) ===== */
   .info-card, .accordion-card {
     position: relative;
     transition: transform .25s ease, box-shadow .25s ease;
+    transform-style: preserve-3d;
+    will-change: transform;
   }
   .mb-wrap:hover .info-card,
   .accordion-card:hover {
-    transform: translateY(-6px);
     box-shadow: 0 20px 25px -5px rgba(0,0,0,.12), 0 8px 10px -6px rgba(0,0,0,.08);
   }
   @media (prefers-reduced-motion: reduce) {
     .info-card, .accordion-card { transition: none; }
-    .mb-wrap:hover .info-card, .accordion-card:hover { transform: none; }
   }
 
   /* ===== Cursor spotlight glow (subtle, follows mouse inside the card) ===== */
@@ -69,7 +69,7 @@
     .info-card::before, .accordion-card::before { display: none; }
   }
 
-  /* ===== Section switching + skeleton loading ===== */
+  /* ===== Section switching (instant swap + quick CSS pop-in) ===== */
   .page-section { display: none; }
   .page-section.active { display: block; animation: sectionPop .35s ease; }
   @keyframes sectionPop {
@@ -78,21 +78,6 @@
   }
   @media (prefers-reduced-motion: reduce) {
     .page-section.active { animation: none; }
-  }
-
-  .section-skeleton { display: none; max-width: 56rem; margin: 2.5rem auto 0; padding: 0 1rem; }
-  .section-skeleton.visible { display: block; }
-  .skel-title, .skel-line, .skel-card {
-    background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 37%, #e5e7eb 63%);
-    background-size: 400% 100%;
-    animation: skelShimmer 1.3s ease-in-out infinite;
-    border-radius: .9rem;
-  }
-  .skel-title { height: 2.5rem; width: 55%; margin: 0 auto 2rem; border-radius: 1.25rem; }
-  .skel-card { height: 6.5rem; margin-bottom: 1.5rem; border-radius: 1rem; }
-  @keyframes skelShimmer { 0% { background-position: 100% 0; } 100% { background-position: 0 0; } }
-  @media (prefers-reduced-motion: reduce) {
-    .skel-title, .skel-line, .skel-card { animation: none; background: #e5e7eb; }
   }
 
   /* ===== Section switching (base rules; cross-fade transition defined further below) ===== */
@@ -328,7 +313,50 @@
   }
 
   /* ===== Count-up numbers ===== */
-  .count-up { font-variant-numeric: tabular-nums; }
+  .count-up { font-variant-numeric: tabular-nums; display: inline-block; }
+  @keyframes countPop { 0% { transform: scale(1); } 45% { transform: scale(1.4); color: #f97316; } 100% { transform: scale(1); } }
+  .count-up.cg-pop { animation: countPop .5s ease; }
+  @media (prefers-reduced-motion: reduce) {
+    .count-up.cg-pop { animation: none; }
+  }
+
+  /* ===== Click ripple (material-style) ===== */
+  .ripple-el { position: relative; }
+  .ripple-layer {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .ripple-layer .ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255,255,255,.55);
+    transform: scale(0);
+    animation: rippleAnim .6s ease-out;
+    pointer-events: none;
+  }
+  @keyframes rippleAnim { to { transform: scale(2.6); opacity: 0; } }
+  @media (prefers-reduced-motion: reduce) {
+    .ripple-layer .ripple { display: none; }
+  }
+
+  /* ===== Confetti easter egg ===== */
+  .confetti-piece {
+    position: fixed;
+    top: -20px;
+    width: 8px;
+    height: 14px;
+    opacity: .9;
+    pointer-events: none;
+    z-index: 200;
+    animation: confettiFall linear forwards;
+  }
+  @keyframes confettiFall {
+    to { transform: translateY(112vh) rotate(720deg); opacity: 0; }
+  }
+  .home-header h1:first-child { cursor: pointer; }
 
   .mb-orange { --mb-c: #f97316; }
 
@@ -414,13 +442,6 @@
     <span class="mh-section" id="mini-header-section">หน้าแรก</span>
   </div>
   <canvas id="bg-ripple-canvas"></canvas>
-
-  <div class="section-skeleton" id="section-skeleton" aria-hidden="true">
-    <div class="skel-title"></div>
-    <div class="skel-card"></div>
-    <div class="skel-card"></div>
-    <div class="skel-card"></div>
-  </div>
 
   <div class="container">
 
@@ -1003,25 +1024,17 @@
       var target = document.getElementById(id);
       if (!target || current === target) return;
 
-      var SKELETON_MS = 480; // เวลาที่โชว์ skeleton ก่อนสลับเนื้อหาจริง (ปรับได้ตรงนี้)
-      var skeleton = document.getElementById('section-skeleton');
-
       dockItems.forEach(function (btn) {
         btn.classList.toggle('active', btn.getAttribute('data-target') === id);
       });
       if (miniHeaderSection) miniHeaderSection.textContent = sectionLabels[id] || '';
 
-      // ซ่อนเนื้อหาเก่าทันที แล้วโชว์ skeleton ระหว่างรอสลับ — ไม่พึ่ง CSS transition
-      // เพื่อไม่ให้พลาดเรื่อง timing แบบก่อนหน้านี้ (และยังเห็นชัดแม้เปิด reduce motion)
+      // สลับทันที ไม่มีหน่วง — .page-section.active มี CSS animation (sectionPop)
+      // fade+เลื่อนขึ้นเบาๆ ในตัวอยู่แล้วตอนโดน add class 'active'
       if (current) current.classList.remove('active');
-      if (skeleton) skeleton.classList.add('visible');
+      target.classList.add('active');
       window.scrollTo({ top: 0, behavior: 'auto' });
-
-      setTimeout(function () {
-        if (skeleton) skeleton.classList.remove('visible');
-        target.classList.add('active');
-        if (window.__updateScrollProgress) window.__updateScrollProgress();
-      }, SKELETON_MS);
+      if (window.__updateScrollProgress) window.__updateScrollProgress();
     }
 
     dockItems.forEach(function (btn) {
@@ -1240,7 +1253,11 @@
           var eased = 1 - Math.pow(1 - progress, 3);
           var value = Math.round(target * eased);
           el.textContent = isThai ? arabicToThai(value) : value;
-          if (progress < 1) requestAnimationFrame(step);
+          if (progress < 1) {
+            requestAnimationFrame(step);
+          } else {
+            el.classList.add('cg-pop'); // เด้งฉลองเล็กๆ ตอนนับถึงเป้าหมาย
+          }
         }
         requestAnimationFrame(step);
       }
@@ -1291,18 +1308,88 @@
       updateMiniHeader();
     })();
 
-    // ---- Cursor spotlight glow on cards ----
+    // ---- Cursor spotlight glow + 3D tilt on cards ----
     (function () {
       if (reduceMotion) return;
       var glowCards = document.querySelectorAll('.info-card, .accordion-card');
+      var MAX_TILT = 6; // องศา เอียงเบาๆ ไม่ให้ดูเวียนหัว
       glowCards.forEach(function (card) {
         card.addEventListener('mousemove', function (e) {
           var rect = card.getBoundingClientRect();
-          var x = ((e.clientX - rect.left) / rect.width) * 100;
-          var y = ((e.clientY - rect.top) / rect.height) * 100;
-          card.style.setProperty('--x', x + '%');
-          card.style.setProperty('--y', y + '%');
+          var px = (e.clientX - rect.left) / rect.width;
+          var py = (e.clientY - rect.top) / rect.height;
+          card.style.setProperty('--x', (px * 100) + '%');
+          card.style.setProperty('--y', (py * 100) + '%');
+          var rotateX = (0.5 - py) * MAX_TILT;
+          var rotateY = (px - 0.5) * MAX_TILT;
+          card.style.transform =
+            'perspective(900px) rotateX(' + rotateX.toFixed(2) + 'deg) rotateY(' + rotateY.toFixed(2) + 'deg) translateY(-6px) scale(1.015)';
         });
+        card.addEventListener('mouseleave', function () {
+          card.style.transform = '';
+        });
+      });
+    })();
+
+    // ---- Click ripple บนปุ่ม (dock nav + ลูกศร gallery) ----
+    // ใช้เลเยอร์ overflow:hidden แยกต่างหาก ไม่ตั้งที่ตัวปุ่มโดยตรง
+    // เพราะ .dock-item มี tooltip โผล่พ้นขอบปุ่ม ถ้า overflow:hidden ที่ปุ่มเลย tooltip จะโดนตัด
+    (function () {
+      if (reduceMotion) return;
+      function addRipple(el, evt) {
+        var layer = el.querySelector('.ripple-layer');
+        if (!layer) {
+          layer = document.createElement('span');
+          layer.className = 'ripple-layer';
+          el.appendChild(layer);
+        }
+        var rect = el.getBoundingClientRect();
+        var size = Math.max(rect.width, rect.height);
+        var span = document.createElement('span');
+        span.className = 'ripple';
+        span.style.width = span.style.height = size + 'px';
+        span.style.left = (evt.clientX - rect.left - size / 2) + 'px';
+        span.style.top = (evt.clientY - rect.top - size / 2) + 'px';
+        layer.appendChild(span);
+        span.addEventListener('animationend', function () { span.remove(); });
+      }
+      document.querySelectorAll('.dock-item, .cg-arrow').forEach(function (el) {
+        el.classList.add('ripple-el');
+        el.addEventListener('click', function (e) { addRipple(el, e); });
+      });
+    })();
+
+    // ---- Confetti easter egg: คลิกหัวข้อ "E-Portfolio" รัวๆ 5 ครั้ง ----
+    (function () {
+      var mainTitle = document.querySelector('.home-header h1');
+      if (!mainTitle) return;
+      var clicks = 0;
+      var resetTimer = null;
+      var colors = ['#3b82f6', '#a855f7', '#ec4899', '#22c55e', '#f97316'];
+
+      function burstConfetti() {
+        if (reduceMotion) return;
+        for (var i = 0; i < 46; i++) {
+          var piece = document.createElement('div');
+          piece.className = 'confetti-piece';
+          piece.style.left = (Math.random() * 100) + 'vw';
+          piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+          piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+          piece.style.animationDuration = (2 + Math.random() * 1.5) + 's';
+          piece.style.animationDelay = (Math.random() * 0.3) + 's';
+          document.body.appendChild(piece);
+          piece.addEventListener('animationend', function () { this.remove(); });
+        }
+      }
+
+      mainTitle.addEventListener('click', function () {
+        clicks++;
+        clearTimeout(resetTimer);
+        resetTimer = setTimeout(function () { clicks = 0; }, 2500);
+        if (clicks >= 5) {
+          clicks = 0;
+          burstConfetti();
+        }
       });
     })();
 
