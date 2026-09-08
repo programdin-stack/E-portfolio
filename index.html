@@ -31,7 +31,7 @@
   .fade-in-up.is-visible { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); }
   .delay-1{transition-delay:.1s} .delay-2{transition-delay:.2s} .delay-3{transition-delay:.3s}
   .delay-4{transition-delay:.4s} .delay-5{transition-delay:.5s} .delay-6{transition-delay:.6s}
-  .delay-7{transition-delay:.7s} .delay-8{transition-delay:.8s}
+  .delay-7{transition-delay:.7s} .delay-8{transition-delay:.8s} .delay-9{transition-delay:.9s}
   @media (prefers-reduced-motion: reduce) {
     .fade-in-up { transition: none; opacity: 1; transform: none; }
   }
@@ -316,8 +316,74 @@
   /* ===== Count-up numbers ===== */
   .count-up { font-variant-numeric: tabular-nums; }
 
+  .mb-orange { --mb-c: #f97316; }
+
   /* ===== Header parallax target ===== */
   .home-header { will-change: transform; }
+
+  /* ===== Circular photo gallery (ภาพกิจกรรม) ===== */
+  .circular-gallery {
+    display: grid;
+    gap: 2rem;
+    align-items: center;
+  }
+  @media (min-width: 768px) {
+    .circular-gallery { grid-template-columns: 1.1fr 1fr; }
+  }
+  .cg-stage {
+    position: relative;
+    width: 100%;
+    height: 16rem;
+    perspective: 1000px;
+  }
+  @media (min-width: 640px) { .cg-stage { height: 19rem; } }
+  .cg-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 1.25rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,.2);
+    opacity: 0;
+    pointer-events: none;
+    transition: transform .8s cubic-bezier(.4,2,.3,1), opacity .8s cubic-bezier(.4,2,.3,1);
+    background: #e5e7eb;
+  }
+  .cg-content { display: flex; flex-direction: column; justify-content: center; }
+  .cg-eyebrow { font-size: .8rem; font-weight: 600; color: #f97316; margin: 0 0 .35rem; letter-spacing: .02em; }
+  .cg-caption { transition: opacity .18s ease, transform .18s ease; }
+  .cg-caption.cg-caption-out { opacity: 0; transform: translateY(-8px); }
+  .cg-title { font-weight: 700; color: #1f2937; font-size: 1.15rem; margin: 0 0 .5rem; }
+  .cg-desc { color: #4b5563; line-height: 1.75; margin: 0; }
+  .cg-word {
+    display: inline-block;
+    opacity: 0;
+    filter: blur(10px);
+    transform: translateY(5px);
+    animation: cgWordIn .22s ease forwards;
+  }
+  @keyframes cgWordIn { to { opacity: 1; filter: blur(0); transform: translateY(0); } }
+  .cg-arrows { display: flex; align-items: center; gap: 1rem; padding-top: 1.5rem; }
+  .cg-arrow {
+    width: 2.6rem; height: 2.6rem;
+    border-radius: 9999px;
+    border: none;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    background: #141414;
+    color: #f1f1f7;
+    transition: background-color .3s ease, transform .2s ease;
+  }
+  .cg-arrow:hover { background: #f97316; transform: scale(1.08); }
+  .cg-arrow svg { width: 1.05rem; height: 1.05rem; }
+  .cg-dots { display: flex; gap: .4rem; margin-left: .5rem; }
+  .cg-dot { width: 7px; height: 7px; border-radius: 9999px; background: #d1d5db; border: none; cursor: pointer; padding: 0; transition: background-color .25s ease, transform .25s ease; }
+  .cg-dot.active { background: #f97316; transform: scale(1.3); }
+  @media (prefers-reduced-motion: reduce) {
+    .cg-img, .cg-caption, .cg-word { transition: none; animation: none; opacity: 1; filter: none; transform: none; }
+    .cg-img.cg-hidden { opacity: 0; }
+  }
 </style>
 </head>
 <body>
@@ -393,8 +459,41 @@
         </div>
       </div>
 
+      <!-- ภาพกิจกรรมและผลงาน -->
+      <div class="mb-wrap mb-orange fade-in-up delay-5" style="margin-bottom:1.5rem;">
+        <div class="mb-inner info-card">
+          <h2 style="color:#ea580c;">📸 ภาพกิจกรรมและผลงาน</h2>
+          <div class="circular-gallery" id="circular-gallery">
+            <div class="cg-stage">
+              <img class="cg-img" src="https://raw.githubusercontent.com/programdin-stack/E-portfolio/main/images/IMG_8832.jpg" alt="รับรางวัล Loei 1 Education Excellence Awards 2026">
+              <img class="cg-img" src="https://raw.githubusercontent.com/programdin-stack/E-portfolio/main/images/IMG_8889.JPG" alt="ภาคีเครือข่ายทางวิชาการ">
+              <img class="cg-img" src="https://raw.githubusercontent.com/programdin-stack/E-portfolio/main/images/IMG_8891.JPG" alt="ร่วมพิธีการของหน่วยงาน">
+              <img class="cg-img" src="https://raw.githubusercontent.com/programdin-stack/E-portfolio/main/images/Screenshot%202026-09-08%20102433.png" alt="ระบบติดตามคะแนนผู้เรียน วิชาวิทยาการคำนวณ ป.6">
+              <img class="cg-img" src="https://raw.githubusercontent.com/programdin-stack/E-portfolio/main/images/Screenshot%202026-09-08%20102751.png" alt="ฝึกปฏิบัติในห้องคอมพิวเตอร์">
+              <img class="cg-img" src="https://raw.githubusercontent.com/programdin-stack/E-portfolio/main/images/Screenshot%202026-09-08%20102802.png" alt="การเรียนรู้ผ่านเกม Play-based Learning">
+            </div>
+            <div class="cg-content">
+              <p class="cg-eyebrow" id="cg-eyebrow">ภาพที่ 1 / 6</p>
+              <div class="cg-caption" id="cg-caption">
+                <h3 class="cg-title" id="cg-title"></h3>
+                <p class="cg-desc" id="cg-desc"></p>
+              </div>
+              <div class="cg-arrows">
+                <button class="cg-arrow cg-prev" aria-label="ภาพก่อนหน้า">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+                </button>
+                <button class="cg-arrow cg-next" aria-label="ภาพถัดไป">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+                </button>
+                <div class="cg-dots" id="cg-dots"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- ข้อตกลงในการพัฒนางานตามมาตรฐานตำแหน่ง -->
-      <div class="mb-wrap mb-pink fade-in-up delay-5" style="margin-bottom:1.5rem;">
+      <div class="mb-wrap mb-pink fade-in-up delay-6" style="margin-bottom:1.5rem;">
         <div class="mb-inner info-card">
           <h2 style="color:#db2777;">📌 ข้อตกลงในการพัฒนางานตามมาตรฐานตำแหน่ง</h2>
           <p><strong>1. ภาระงาน:</strong> เป็นไปตามที่ ก.ค.ศ. กำหนด</p>
@@ -410,7 +509,7 @@
       </div>
 
       <!-- ข้อตกลงที่เป็นประเด็นท้าทาย -->
-      <div class="mb-wrap mb-pink fade-in-up delay-6" style="margin-bottom:1.5rem;">
+      <div class="mb-wrap mb-pink fade-in-up delay-7" style="margin-bottom:1.5rem;">
         <div class="mb-inner info-card">
           <h2 style="color:#db2777;">📌 ข้อตกลงที่เป็นประเด็นท้าทาย</h2>
           <p><strong>เรื่อง:</strong> การพัฒนาความน่าเชื่อถือของข้อมูลผ่านเกม (Play-based learning)</p>
@@ -429,11 +528,11 @@
         </div>
       </div>
 
-      <p class="home-nav-hint fade-in-up delay-7">
+      <p class="home-nav-hint fade-in-up delay-8">
         ใช้เมนูด้านล่างเพื่อไปยัง <strong>ด้านที่ ๑ ด้านที่ ๒</strong> และ <strong>ด้านที่ ๓</strong> ของข้อตกลง PA
       </p>
 
-      <div class="fade-in-up delay-8" style="text-align:center; margin-top:2rem; font-size:.85rem; color:#9ca3af;">
+      <div class="fade-in-up delay-9" style="text-align:center; margin-top:2rem; font-size:.85rem; color:#9ca3af;">
         ปรับปรุงล่าสุด: 15 พฤษภาคม 2569 | พัฒนาโดย <strong>ครูตรีทเศศ ไตรโยธี</strong>
       </div>
     </section>
@@ -1192,6 +1291,151 @@
           card.style.setProperty('--y', y + '%');
         });
       });
+    })();
+
+    // ---- Circular photo gallery (ภาพกิจกรรมและผลงาน) ----
+    (function () {
+      var gallery = document.getElementById('circular-gallery');
+      if (!gallery) return;
+
+      var stage = gallery.querySelector('.cg-stage');
+      var images = Array.prototype.slice.call(stage.querySelectorAll('.cg-img'));
+      var titleEl = document.getElementById('cg-title');
+      var descEl = document.getElementById('cg-desc');
+      var captionEl = document.getElementById('cg-caption');
+      var eyebrowEl = document.getElementById('cg-eyebrow');
+      var dotsWrap = document.getElementById('cg-dots');
+      var prevBtn = gallery.querySelector('.cg-prev');
+      var nextBtn = gallery.querySelector('.cg-next');
+
+      // คำบรรยายเรียงตามลำดับรูปด้านบน — แก้ข้อความตรงนี้ได้เลยถ้าอยากเปลี่ยนคำอธิบาย
+      var data = [
+        {
+          title: 'รับรางวัล Loei 1 Education Excellence Awards 2026',
+          desc: 'เข้าร่วมพิธีมอบโล่และเกียรติบัตรรางวัล Loei 1 Education Excellence Awards 2026 จาก สพป.เลย เขต 1'
+        },
+        {
+          title: 'ภาคีเครือข่ายทางวิชาการ (Academic Partners)',
+          desc: 'ร่วมพิธีมอบเกียรติบัตรและการประชุมเชิงปฏิบัติการขับเคลื่อนการพัฒนาคุณภาพการศึกษาร่วมกับภาคีที่ปรึกษาทางวิชาการ'
+        },
+        {
+          title: 'ร่วมพิธีการของหน่วยงาน',
+          desc: 'เข้าร่วมพิธีการที่จัดขึ้นโดยหน่วยงานต้นสังกัดอย่างพร้อมเพรียง'
+        },
+        {
+          title: 'ระบบติดตามคะแนนผู้เรียน วิชาวิทยาการคำนวณ ป.6',
+          desc: 'นวัตกรรมระบบสารสนเทศแบบเกมมิฟิเคชัน (Gamification) พัฒนาขึ้นเพื่อติดตามผลการเรียนรู้และสร้างแรงจูงใจให้ผู้เรียน'
+        },
+        {
+          title: 'ฝึกปฏิบัติในห้องคอมพิวเตอร์',
+          desc: 'นักเรียนฝึกปฏิบัติจริงในห้องปฏิบัติการคอมพิวเตอร์ ตามแผนการจัดการเรียนรู้วิชาวิทยาการคำนวณ'
+        },
+        {
+          title: 'การเรียนรู้ผ่านเกม (Play-based Learning)',
+          desc: 'ผู้เรียนร่วมกันทำกิจกรรมผ่านเกม เพื่อพัฒนาความน่าเชื่อถือของข้อมูลและทักษะการคิดวิเคราะห์ ตามประเด็นท้าทายที่กำหนดไว้'
+        }
+      ];
+
+      var activeIndex = 0;
+      var autoplayTimer = null;
+      var len = images.length;
+
+      // สร้างจุด (dots) ไว้กดข้ามไปแต่ละภาพ
+      data.forEach(function (_, i) {
+        var dot = document.createElement('button');
+        dot.className = 'cg-dot' + (i === 0 ? ' active' : '');
+        dot.setAttribute('aria-label', 'ไปที่ภาพที่ ' + (i + 1));
+        dot.addEventListener('click', function () { goTo(i); });
+        dotsWrap.appendChild(dot);
+      });
+      var dots = Array.prototype.slice.call(dotsWrap.querySelectorAll('.cg-dot'));
+
+      function calcGap(width) {
+        var minWidth = 320, maxWidth = 640, minGap = 26, maxGap = 42;
+        if (width <= minWidth) return minGap;
+        if (width >= maxWidth) return maxGap;
+        return minGap + (maxGap - minGap) * ((width - minWidth) / (maxWidth - minWidth));
+      }
+
+      function applyStyles() {
+        var gap = calcGap(stage.offsetWidth);
+        var stickUp = gap * 0.55;
+        images.forEach(function (img, index) {
+          var isActive = index === activeIndex;
+          var isLeft = (activeIndex - 1 + len) % len === index;
+          var isRight = (activeIndex + 1) % len === index;
+          if (isActive) {
+            img.style.zIndex = '3';
+            img.style.opacity = '1';
+            img.style.pointerEvents = 'auto';
+            img.style.transform = 'translateX(0) translateY(0) scale(1) rotateY(0deg)';
+          } else if (isLeft) {
+            img.style.zIndex = '2';
+            img.style.opacity = '1';
+            img.style.pointerEvents = 'auto';
+            img.style.transform = 'translateX(-' + gap + 'px) translateY(-' + stickUp + 'px) scale(.85) rotateY(15deg)';
+          } else if (isRight) {
+            img.style.zIndex = '2';
+            img.style.opacity = '1';
+            img.style.pointerEvents = 'auto';
+            img.style.transform = 'translateX(' + gap + 'px) translateY(-' + stickUp + 'px) scale(.85) rotateY(-15deg)';
+          } else {
+            img.style.zIndex = '1';
+            img.style.opacity = '0';
+            img.style.pointerEvents = 'none';
+          }
+        });
+      }
+
+      function renderCaption() {
+        var item = data[activeIndex];
+        if (eyebrowEl) eyebrowEl.textContent = 'ภาพที่ ' + (activeIndex + 1) + ' / ' + len;
+        titleEl.textContent = item.title;
+        descEl.innerHTML = '';
+        item.desc.split(' ').forEach(function (word, i) {
+          var span = document.createElement('span');
+          span.className = 'cg-word';
+          span.style.animationDelay = (0.025 * i) + 's';
+          span.textContent = word + '\u00A0';
+          descEl.appendChild(span);
+        });
+        dots.forEach(function (d, i) { d.classList.toggle('active', i === activeIndex); });
+      }
+
+      function update() {
+        applyStyles();
+        if (reduceMotion) { renderCaption(); return; }
+        captionEl.classList.add('cg-caption-out');
+        setTimeout(function () {
+          renderCaption();
+          captionEl.classList.remove('cg-caption-out');
+        }, 160);
+      }
+
+      function goTo(index) {
+        activeIndex = (index + len) % len;
+        update();
+        resetAutoplay();
+      }
+      function next() { goTo(activeIndex + 1); }
+      function prev() { goTo(activeIndex - 1); }
+
+      function resetAutoplay() {
+        if (autoplayTimer) clearInterval(autoplayTimer);
+        if (reduceMotion) return;
+        autoplayTimer = setInterval(function () {
+          activeIndex = (activeIndex + 1) % len;
+          update();
+        }, 5000);
+      }
+
+      if (nextBtn) nextBtn.addEventListener('click', next);
+      if (prevBtn) prevBtn.addEventListener('click', prev);
+      window.addEventListener('resize', applyStyles);
+
+      applyStyles();
+      renderCaption();
+      resetAutoplay();
     })();
   </script>
 
