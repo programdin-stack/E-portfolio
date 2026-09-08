@@ -38,6 +38,7 @@
 
   /* ===== Playful hover lift on cards ===== */
   .info-card, .accordion-card {
+    position: relative;
     transition: transform .25s ease, box-shadow .25s ease;
   }
   .mb-wrap:hover .info-card,
@@ -50,9 +51,37 @@
     .mb-wrap:hover .info-card, .accordion-card:hover { transform: none; }
   }
 
-  /* ===== Section switching ===== */
-  .page-section { display: none; }
+  /* ===== Cursor spotlight glow (subtle, follows mouse inside the card) ===== */
+  .info-card::before, .accordion-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(500px circle at var(--x, 50%) var(--y, 50%), rgba(59,130,246,.08), transparent 45%);
+    opacity: 0;
+    transition: opacity .35s ease;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .info-card:hover::before, .accordion-card:hover::before { opacity: 1; }
+  .info-card > *, .accordion-card > * { position: relative; z-index: 1; }
+  @media (prefers-reduced-motion: reduce) {
+    .info-card::before, .accordion-card::before { display: none; }
+  }
+
+  /* ===== Section cross-fade ===== */
+  .page-section {
+    display: none;
+    opacity: 0;
+    transition: opacity .3s ease;
+  }
   .page-section.active { display: block; }
+  .page-section.active.section-visible { opacity: 1; }
+  @media (prefers-reduced-motion: reduce) {
+    .page-section { transition: none; }
+  }
+
+  /* ===== Section switching (base rules; cross-fade transition defined further below) ===== */
 
   /* ===== Title ===== */
   .main-title-wrapper { text-align: center; margin-bottom: 2.5rem; }
@@ -256,6 +285,34 @@
     transition: width .08s linear;
   }
 
+  /* ===== Sticky mini header (appears after scrolling past hero) ===== */
+  #mini-header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 90;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: .5rem;
+    padding: .6rem 1rem;
+    background: rgba(255,255,255,.75);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(229,231,235,.8);
+    font-size: .85rem;
+    color: #374151;
+    opacity: 0;
+    transform: translateY(-100%);
+    transition: opacity .3s ease, transform .3s ease;
+    pointer-events: none;
+  }
+  #mini-header.visible { opacity: 1; transform: translateY(0); }
+  #mini-header .mh-name { font-weight: 600; color: #1d4ed8; }
+  #mini-header .mh-sep { color: #9ca3af; }
+  #mini-header .mh-section { color: #6b7280; }
+  @media (prefers-reduced-motion: reduce) {
+    #mini-header { transition: none; }
+  }
+
   /* ===== Count-up numbers ===== */
   .count-up { font-variant-numeric: tabular-nums; }
 
@@ -266,6 +323,11 @@
 <body>
 
   <div id="scroll-progress"></div>
+  <div id="mini-header">
+    <span class="mh-name">ตรีทเศศ ไตรโยธี</span>
+    <span class="mh-sep">·</span>
+    <span class="mh-section" id="mini-header-section">หน้าแรก</span>
+  </div>
   <canvas id="bg-ripple-canvas"></canvas>
 
   <div class="container">
@@ -804,18 +866,40 @@
   </div>
 
   <script>
-    // ---- Section switching ----
+    // ---- Section switching (with cross-fade) ----
     var sections = document.querySelectorAll('.page-section');
     var dockItems = document.querySelectorAll('.dock-item');
+    var sectionLabels = { home: 'หน้าแรก', s1: 'ด้านที่ ๑', s2: 'ด้านที่ ๒', s3: 'ด้านที่ ๓' };
+    var miniHeaderSection = document.getElementById('mini-header-section');
 
     function showSection(id) {
-      sections.forEach(function (sec) {
-        sec.classList.toggle('active', sec.id === id);
-      });
+      var current = document.querySelector('.page-section.active');
+      var target = document.getElementById(id);
+      if (!target || current === target) return;
+
       dockItems.forEach(function (btn) {
         btn.classList.toggle('active', btn.getAttribute('data-target') === id);
       });
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      if (miniHeaderSection) miniHeaderSection.textContent = sectionLabels[id] || '';
+
+      function activateTarget() {
+        target.classList.add('active');
+        requestAnimationFrame(function () {
+          requestAnimationFrame(function () { target.classList.add('section-visible'); });
+        });
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        if (window.__updateScrollProgress) setTimeout(window.__updateScrollProgress, 350);
+      }
+
+      if (current) {
+        current.classList.remove('section-visible');
+        setTimeout(function () {
+          current.classList.remove('active');
+          activateTarget();
+        }, 220);
+      } else {
+        activateTarget();
+      }
     }
 
     dockItems.forEach(function (btn) {
@@ -823,6 +907,16 @@
         showSection(btn.getAttribute('data-target'));
       });
     });
+
+    // reveal the initially-active section
+    (function () {
+      var initial = document.querySelector('.page-section.active');
+      if (initial) {
+        requestAnimationFrame(function () {
+          requestAnimationFrame(function () { initial.classList.add('section-visible'); });
+        });
+      }
+    })();
 
     // ---- Dock magnification effect (mac-dock style, vanilla JS) ----
     var dock = document.getElementById('dock');
@@ -1072,12 +1166,33 @@
       onScrollParallax();
     })();
 
-    // ---- Recalculate progress bar when switching ด้านที่ ๑/๒/๓ (content height changes) ----
-    dockItems.forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        if (window.__updateScrollProgress) setTimeout(window.__updateScrollProgress, 350);
+    // ---- Sticky mini-header (shows after scrolling past the hero) ----
+    (function () {
+      var miniHeader = document.getElementById('mini-header');
+      var hero = document.querySelector('.home-header');
+      if (!miniHeader) return;
+      function updateMiniHeader() {
+        var threshold = hero ? hero.offsetHeight + 40 : 220;
+        miniHeader.classList.toggle('visible', window.scrollY > threshold);
+      }
+      window.addEventListener('scroll', function () { requestAnimationFrame(updateMiniHeader); }, { passive: true });
+      updateMiniHeader();
+    })();
+
+    // ---- Cursor spotlight glow on cards ----
+    (function () {
+      if (reduceMotion) return;
+      var glowCards = document.querySelectorAll('.info-card, .accordion-card');
+      glowCards.forEach(function (card) {
+        card.addEventListener('mousemove', function (e) {
+          var rect = card.getBoundingClientRect();
+          var x = ((e.clientX - rect.left) / rect.width) * 100;
+          var y = ((e.clientY - rect.top) / rect.height) * 100;
+          card.style.setProperty('--x', x + '%');
+          card.style.setProperty('--y', y + '%');
+        });
       });
-    });
+    })();
   </script>
 
 </body>
