@@ -31,7 +31,7 @@
   .fade-in-up.is-visible { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); }
   .delay-1{transition-delay:.1s} .delay-2{transition-delay:.2s} .delay-3{transition-delay:.3s}
   .delay-4{transition-delay:.4s} .delay-5{transition-delay:.5s} .delay-6{transition-delay:.6s}
-  .delay-7{transition-delay:.7s} .delay-8{transition-delay:.8s} .delay-9{transition-delay:.9s}
+  .delay-7{transition-delay:.7s} .delay-8{transition-delay:.8s} .delay-9{transition-delay:.9s} .delay-10{transition-delay:1s}
   
 
   /* ===== Playful hover lift + 3D tilt on cards (transform driven by JS) ===== */
@@ -409,7 +409,88 @@
   .cg-progress { width: 100%; max-width: 220px; height: 3px; background: rgba(0,0,0,.08); border-radius: 9999px; margin-top: .9rem; overflow: hidden; }
   .cg-progress-bar { height: 100%; width: 0%; background: linear-gradient(to right, #f97316, #ec4899); border-radius: inherit; }
   .cg-progress-bar.cg-animating { transition: width 5s linear; width: 100%; }
-  
+
+  /* ===== Theme toggle button ===== */
+  .theme-toggle {
+    position: fixed;
+    top: 14px;
+    right: 14px;
+    z-index: 95;
+    width: 2.6rem; height: 2.6rem;
+    border-radius: 9999px;
+    border: 1px solid rgba(0,0,0,.08);
+    background: rgba(255,255,255,.85);
+    backdrop-filter: blur(8px);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,.08);
+    transition: background-color .3s ease, border-color .3s ease, transform .2s ease;
+  }
+  .theme-toggle:hover { transform: scale(1.08); }
+  .theme-toggle:active { transform: scale(.94); }
+  .theme-toggle svg { width: 1.15rem; height: 1.15rem; }
+  .theme-toggle .icon-sun { color: #f97316; }
+  .theme-toggle .icon-moon { display: none; color: #facc15; }
+
+  /* ===== Back-to-top floating button ===== */
+  .back-to-top {
+    position: fixed;
+    right: 1.1rem;
+    bottom: 6.5rem;
+    z-index: 60;
+    width: 2.8rem; height: 2.8rem;
+    border-radius: 9999px;
+    border: none;
+    background: #3b82f6;
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(59,130,246,.35);
+    opacity: 0;
+    transform: translateY(12px) scale(.9);
+    pointer-events: none;
+    transition: opacity .3s ease, transform .3s ease, background-color .3s ease;
+  }
+  .back-to-top.visible { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
+  .back-to-top:hover { background: #2563eb; transform: translateY(-3px) scale(1.05); }
+  .back-to-top svg { width: 1.2rem; height: 1.2rem; }
+
+  /* ===== Dark mode ===== */
+  body.dark-mode {
+    background-color: #0b1120;
+    background-image: linear-gradient(to bottom right, #0b1120, #111827);
+    color: #d1d5db;
+  }
+  body.dark-mode .info-card, body.dark-mode .accordion-card {
+    background: #161c2c;
+    border-color: #263049;
+  }
+  body.dark-mode .info-card h2 { color: #e5e7eb !important; border-bottom-color: #2b3550 !important; }
+  body.dark-mode .accordion-label .title { color: #e5e7eb; }
+  body.dark-mode .accordion-label:hover { background-color: #1c2439; }
+  body.dark-mode .content-inner { color: #cbd5e1; border-top-color: #263049; }
+  body.dark-mode .content-inner h3 { color: #e5e7eb; }
+  body.dark-mode .info-grid p, body.dark-mode .info-grid strong { color: #cbd5e1; }
+  body.dark-mode .info-card ul { color: #cbd5e1; }
+  body.dark-mode .sub-title, body.dark-mode .home-nav-hint { color: #94a3b8; }
+  body.dark-mode .doc-links a { color: #60a5fa; }
+  body.dark-mode .doc-links a:hover { color: #93c5fd; }
+  body.dark-mode .hours-badge { color: #60a5fa; }
+  body.dark-mode .dock { background: rgba(17,24,39,.9); box-shadow: 0 10px 25px -5px rgba(0,0,0,.4), 0 0 0 1px rgba(255,255,255,.05); }
+  body.dark-mode .dock-item { background: #263049; color: #cbd5e1; }
+  body.dark-mode .dock-item.active { background: #3b82f6; color: #fff; }
+  body.dark-mode .dock-tooltip { background: #1c2439; border-color: #2b3550; color: #cbd5e1; }
+  body.dark-mode #mini-header { background: rgba(13,18,32,.8); border-bottom-color: #263049; color: #cbd5e1; }
+  body.dark-mode #mini-header .mh-section { color: #94a3b8; }
+  body.dark-mode .cg-title { color: #e5e7eb; }
+  body.dark-mode .cg-desc { color: #94a3b8; }
+  body.dark-mode .cg-progress { background: rgba(255,255,255,.1); }
+  body.dark-mode .theme-toggle { background: #161c2c; border-color: #263049; }
+  body.dark-mode .theme-toggle .icon-sun { display: none; }
+  body.dark-mode .theme-toggle .icon-moon { display: block; }
+  body.dark-mode .qr-caption { color: #94a3b8 !important; }
+  body.dark-mode .qr-url { color: #64748b !important; }
+
 </style>
 </head>
 <body>
@@ -421,6 +502,19 @@
     <span class="mh-section" id="mini-header-section">หน้าแรก</span>
   </div>
   <canvas id="bg-ripple-canvas"></canvas>
+
+  <button id="theme-toggle" class="theme-toggle" aria-label="สลับโหมดมืด/สว่าง" title="สลับโหมดมืด/สว่าง">
+    <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+    </svg>
+    <svg class="icon-moon" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+  </button>
+
+  <button id="back-to-top" class="back-to-top" aria-label="กลับขึ้นบนสุด" title="กลับขึ้นบนสุด">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+  </button>
 
   <div class="container">
 
@@ -555,11 +649,26 @@
         </div>
       </div>
 
-      <p class="home-nav-hint fade-in-up delay-8">
+      <!-- แชร์เว็บผ่าน QR Code -->
+      <div class="mb-wrap mb-blue fade-in-up delay-8" style="margin-bottom:1.5rem;">
+        <div class="mb-inner info-card" style="text-align:center;">
+          <h2 style="color:#2563eb;">📱 แชร์ E-Portfolio นี้</h2>
+          <p class="qr-caption" style="color:#4b5563; margin:0 0 1rem;">สแกน QR Code ด้านล่างเพื่อเปิดดูเว็บนี้บนมือถือ หรือส่งต่อให้ผู้อื่น</p>
+          <img
+            src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https%3A%2F%2Fprogramdin-stack.github.io%2FE-portfolio%2F"
+            alt="QR Code ลิงก์เว็บ E-Portfolio ของ ครูตรีทเศศ ไตรโยธี"
+            width="180" height="180"
+            style="border-radius:1rem; box-shadow:0 10px 20px rgba(0,0,0,.12); background:#fff; padding:.5rem;"
+            loading="lazy">
+          <p class="qr-url" style="color:#9ca3af; font-size:.8rem; margin-top:.75rem; word-break:break-all;">programdin-stack.github.io/E-portfolio/</p>
+        </div>
+      </div>
+
+      <p class="home-nav-hint fade-in-up delay-9">
         ใช้เมนูด้านล่างเพื่อไปยัง <strong>ด้านที่ ๑ ด้านที่ ๒</strong> และ <strong>ด้านที่ ๓</strong> ของข้อตกลง PA
       </p>
 
-      <div class="fade-in-up delay-9" style="text-align:center; margin-top:2rem; font-size:.85rem; color:#9ca3af;">
+      <div class="fade-in-up delay-10" style="text-align:center; margin-top:2rem; font-size:.85rem; color:#9ca3af;">
         ปรับปรุงล่าสุด: 15 พฤษภาคม 2569 | พัฒนาโดย <strong>ครูตรีทเศศ ไตรโยธี</strong>
       </div>
     </section>
@@ -1370,6 +1479,45 @@
           burstConfetti();
         }
       });
+    })();
+
+    // ---- Theme toggle (dark mode) พร้อมจำค่าไว้ใน localStorage ----
+    (function () {
+      var toggle = document.getElementById('theme-toggle');
+      if (!toggle) return;
+      var STORAGE_KEY = 'eportfolio-theme';
+
+      function applyTheme(mode) {
+        document.body.classList.toggle('dark-mode', mode === 'dark');
+      }
+
+      var saved = null;
+      try { saved = localStorage.getItem(STORAGE_KEY); } catch (e) {}
+
+      if (saved === 'dark' || saved === 'light') {
+        applyTheme(saved);
+      } else {
+        var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        applyTheme(prefersDark ? 'dark' : 'light');
+      }
+
+      toggle.addEventListener('click', function () {
+        var next = document.body.classList.contains('dark-mode') ? 'light' : 'dark';
+        applyTheme(next);
+        try { localStorage.setItem(STORAGE_KEY, next); } catch (e) {}
+      });
+    })();
+
+    // ---- ปุ่มกลับขึ้นบนสุด ----
+    (function () {
+      var btn = document.getElementById('back-to-top');
+      if (!btn) return;
+      function update() { btn.classList.toggle('visible', window.scrollY > 400); }
+      window.addEventListener('scroll', function () { requestAnimationFrame(update); }, { passive: true });
+      btn.addEventListener('click', function () {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+      update();
     })();
 
     // ---- Circular photo gallery (ภาพกิจกรรมและผลงาน) ----
